@@ -4,7 +4,9 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
-public class MySQLTool {
+import redis.clients.jedis.Jedis;
+
+public class DataBaseTool {
 
 	private static Configuration conf = new Configuration().configure();
 	private static SessionFactory sessionFactory = conf.buildSessionFactory();
@@ -18,7 +20,22 @@ public class MySQLTool {
 		sessionFactory.close();
 	}
 
-	private MySQLTool() {
+	// ---------------------------------------------------------
+
+	private static Jedis jedis = new Jedis("10.10.12.120", 6379);
+	static {
+		jedis.auth("404wang");
+	}
+
+	public static Jedis getJedis() {
+		return jedis;
+	}
+
+	public static void clossJedis() {
+		jedis.close();
+	}
+
+	private DataBaseTool() {
 
 	}
 

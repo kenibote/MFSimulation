@@ -23,6 +23,9 @@ public class Creater {
 
 	private Integer totalSubscribeNmuber;
 
+	@Enumerated(EnumType.STRING)
+	private Popular popular;
+
 	@ElementCollection(targetClass = Integer.class)
 	@CollectionTable(name = "creater_zoneNumber_info", joinColumns = @JoinColumn(name = "createrId", nullable = false))
 	@MapKeyColumn(name = "zoneId")
@@ -45,11 +48,11 @@ public class Creater {
 		this.createrName = createrName;
 	}
 
-	public Integer getId() {
+	public Integer getCreaterId() {
 		return createrId;
 	}
 
-	public void setId(Integer createrId) {
+	public void setCreaterId(Integer createrId) {
 		this.createrId = createrId;
 	}
 
@@ -91,6 +94,14 @@ public class Creater {
 
 	public void setTotalSubscribeNmuber(Integer totalSubscribeNmuber) {
 		this.totalSubscribeNmuber = totalSubscribeNmuber;
+	}
+
+	public Popular getPopular() {
+		return popular;
+	}
+
+	public void setPopular(Popular popular) {
+		this.popular = popular;
 	}
 
 	public Map<Integer, Integer> getZoneSubscribeNumber() {
