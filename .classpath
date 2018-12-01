@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/redis/commons-pool2-2.3.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/redis/jedis-2.7.0.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/hibernate/hibernate-core-5.3.7.Final.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/hibernate/dom4j-2.1.1.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/hibernate/byte-buddy-1.8.17.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/hibernate/javassist-3.23.1-GA.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/hibernate/hibernate-commons-annotations-5.0.4.Final.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/hibernate/jandex-2.0.5.Final.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/hibernate/classmate-1.3.4.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/hibernate/jboss-transaction-api_1.2_spec-1.1.1.Final.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/hibernate/jboss-logging-3.3.2.Final.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/hibernate/javax.activation-api-1.2.0.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/hibernate/javax.persistence-api-2.2.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/hibernate/antlr-2.7.7.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/mysql-connector-java-5.1.37-bin.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/junit/junit-4.9.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
