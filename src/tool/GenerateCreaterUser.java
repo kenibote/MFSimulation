@@ -191,7 +191,53 @@ public class GenerateCreaterUser {
 	}
 
 	@Test
-	public void DeleteTimePattern() {
+	public void TimePattern_More_ND() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+
+		TreeMap<Integer, Double> nd1 = NormalDistribution(11, 1.8);
+		TreeMap<Integer, Double> nd2 = NormalDistribution(17, 0.7);
+		TreeMap<Integer, Double> nd3 = NormalDistribution(20, 1.8);
+
+		TreeMap<Integer, Double> com = new TreeMap<>();
+		double sum = 0;
+		for (int i = 0; i < 24; i++) {
+			double value = 3 * nd1.get(i) + 1 * nd2.get(i) + 4 * nd3.get(i);
+			sum = sum + value;
+			com.put(i, value);
+		}
+
+		TimePattern up = new TimePattern(14, "test_more_nd");
+		for (int i = 0; i < 24; i++) {
+			up.getPattern().put(i, com.get(i) / sum);
+		}
+
+		session.save(up);
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
+	public void DeleteTimePatternOnce() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+
+		TimePattern up = session.get(TimePattern.class, 14);
+		session.delete(up);
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
+	public void DeleteTimePatternBatch() {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
 		// ------------------------------------------
