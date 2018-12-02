@@ -19,7 +19,7 @@ public class Creater {
 
 	private Double uploadArrivalRate;
 
-	private String uploadTimePatternName;
+	private String TimePatternName;
 
 	private Integer totalSubscribeNmuber;
 
@@ -39,7 +39,6 @@ public class Creater {
 	private Set<Integer> subscribers = new HashSet<>();
 
 	public Creater() {
-		// TODO 自动生成的构造函数存根
 	}
 
 	public Creater(Integer createrId, String createrName) {
@@ -80,12 +79,12 @@ public class Creater {
 		this.uploadArrivalRate = uploadArrivalRate;
 	}
 
-	public String getUploadTimePatternName() {
-		return uploadTimePatternName;
+	public String getTimePatternName() {
+		return TimePatternName;
 	}
 
-	public void setUploadTimePatternName(String uploadTimePatternName) {
-		this.uploadTimePatternName = uploadTimePatternName;
+	public void setTimePatternName(String timePatternName) {
+		TimePatternName = timePatternName;
 	}
 
 	public Integer getTotalSubscribeNmuber() {

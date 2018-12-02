@@ -62,7 +62,8 @@
 			路径书写: 填写src下的路径
 		 --> 
 		<mapping class="sql.Creater" />
-		<mapping class="sql.UploadTimePattern" />
+		<mapping class="sql.TimePattern" />
+		<!-- <mapping class="sql.User" /> -->
 		
 	</session-factory>
 </hibernate-configuration>

@@ -18,5 +18,7 @@
 	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/hibernate/antlr-2.7.7.jar"/>
 	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/mysql-connector-java-5.1.37-bin.jar"/>
 	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/junit/junit-4.9.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/picture/jfreechart-1.0.13.jar"/>
+	<classpathentry kind="lib" path="/Users/kenibote/Documents/workspace/MFSimulation/lib/picture/jcommon-1.0.16.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
