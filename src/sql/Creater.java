@@ -119,4 +119,11 @@ public class Creater {
 		this.subscribers = subscribers;
 	}
 
+	@Override
+	public String toString() {
+		return "Creater [createrId=" + createrId + ", createrName=" + createrName + ", zipfLike=" + zipfLike
+				+ ", uploadArrivalRate=" + uploadArrivalRate + ", TimePatternName=" + TimePatternName
+				+ ", totalSubscribeNmuber=" + totalSubscribeNmuber + ", popular=" + popular + "]";
+	}
+
 }

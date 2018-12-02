@@ -87,4 +87,9 @@ public class TimePattern {
 		return date;
 	}
 
+	@Override
+	public String toString() {
+		return "TimePattern [TimePatternId=" + TimePatternId + ", TimePatternName=" + TimePatternName + "]";
+	}
+
 }

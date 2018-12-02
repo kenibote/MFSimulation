@@ -63,7 +63,7 @@
 		 --> 
 		<mapping class="sql.Creater" />
 		<mapping class="sql.TimePattern" />
-		<!-- <mapping class="sql.User" /> -->
+	 	<mapping class="sql.User" />
 		
 	</session-factory>
 </hibernate-configuration>
