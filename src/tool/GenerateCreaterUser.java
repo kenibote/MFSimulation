@@ -9,6 +9,7 @@ import java.util.*;
 import sql.Creater;
 import sql.Popular;
 import sql.TimePattern;
+import sql.User;
 
 public class GenerateCreaterUser {
 
@@ -16,6 +17,8 @@ public class GenerateCreaterUser {
 	static int TotalCreaterNumber = 1000;
 	static double zipfAlpha = 1.0;
 	static double popular_ratio = 0.2;
+	static int zoneNumber = 4;
+	static int[] userNumber = { 0, 2500, 2500, 2500, 2500 };
 
 	// TODO Questions:
 	/*
@@ -231,6 +234,48 @@ public class GenerateCreaterUser {
 		// 画图
 		DrawPicture.DrawChart(dataset, "Propability Count", "Time", "Count");
 		DrawPicture.waitExit();
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
+	public void generateUserBasicInfo() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+
+		int id = 1;
+		for (int z = 1; z <= zoneNumber; z++) {
+			for (int i = 1; i <= userNumber[z]; i++) {
+				String pix = "";
+				int len = ("" + i).length();
+
+				switch (len) {
+				case 1:
+					pix = "000" + i;
+					break;
+				case 2:
+					pix = "00" + i;
+					break;
+				case 3:
+					pix = "0" + i;
+					break;
+				case 4:
+					pix = "" + i;
+					break;
+				}
+
+				User user = new User(id++, "User_" + z + "_" + pix);
+				user.setBelongZoneName("Zone_" + z);
+				user.setCacheAddress("ContentCache_" + user.getUserName());
+				session.save(user);
+			}
+			session.flush();
+			session.clear();
+		}
 
 		// ------------------------------------------
 		tx.commit();
