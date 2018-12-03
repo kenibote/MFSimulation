@@ -205,6 +205,7 @@ public class GenerateCreaterUser {
 	}
 
 	@Test
+	// 多个正态分布叠加，构成复杂曲线图
 	public void TimePattern_More_ND() {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
@@ -295,7 +296,7 @@ public class GenerateCreaterUser {
 	}
 
 	@Test
-	// 产生基本的User信息
+	// 产生基本的User信息 id, name, zone, cache_address
 	public void generateUserBasicInfo() {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();

@@ -12,7 +12,7 @@ public class RedisTool {
 
 	@SuppressWarnings({ "deprecation", "unchecked" })
 	@Test
-	// 初始化需要大约3分钟
+	// windows本机器上仅需几秒
 	public void initRedis() {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
@@ -45,6 +45,7 @@ public class RedisTool {
 		}
 
 		// TODO 每个区域内，每个内容在哪些Fog上有存
+		// 这个还是放在Redis里面， 用每个内容的名字做地址。set数据类型，操作起来速度很快。
 
 		// 每个MEC 服务器的目前负载 (type = hash map)
 		for (int zone = 1; zone <= GenerateCreaterUser.zoneNumber; zone++) {

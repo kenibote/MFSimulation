@@ -1,5 +1,7 @@
 package demo;
 
+import java.util.Date;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -30,5 +32,16 @@ public class Demo {
 		tx.commit();
 		session.close();
 		sessionFactory.close();
+	}
+
+	@Test
+	public void DateTest() {
+		Date d = new Date(2018 - 1900, 1, 1, 23, 26, 0);
+
+		long t1 = d.getTime();
+
+		Date d2 = new Date(t1 + 34 * 60 * 1000);
+		System.out.println(d2);
+
 	}
 }

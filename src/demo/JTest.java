@@ -39,11 +39,10 @@ public class JTest {
 	public static void main(String[] args) {
 		jedis.select(1);
 
-		HashMap<String, Double> member1 = new HashMap<>();
-		member1.put("v5", 250.0);
-		member1.put("v6", 360.0);
-		jedis.zadd("sort", member1);
+		//jedis.sadd("Content_001", "user2");
+		
+		System.out.print(jedis.srem("Content_001", "user3"));
 
-		System.out.println(jedis.zrevrank("sort", "v2"));
+		//System.out.println(jedis.zrevrank("sort", "v2"));
 	}
 }
