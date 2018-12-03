@@ -19,7 +19,7 @@ public class Creater {
 
 	private Double uploadArrivalRate;
 
-	private String TimePatternName;
+	private int TimePatternId;
 
 	private Integer totalSubscribeNmuber;
 
@@ -79,12 +79,12 @@ public class Creater {
 		this.uploadArrivalRate = uploadArrivalRate;
 	}
 
-	public String getTimePatternName() {
-		return TimePatternName;
+	public int getTimePatternId() {
+		return TimePatternId;
 	}
 
-	public void setTimePatternName(String timePatternName) {
-		TimePatternName = timePatternName;
+	public void setTimePatternId(int timePatternId) {
+		TimePatternId = timePatternId;
 	}
 
 	public Integer getTotalSubscribeNmuber() {
@@ -122,7 +122,7 @@ public class Creater {
 	@Override
 	public String toString() {
 		return "Creater [createrId=" + createrId + ", createrName=" + createrName + ", zipfLike=" + zipfLike
-				+ ", uploadArrivalRate=" + uploadArrivalRate + ", TimePatternName=" + TimePatternName
+				+ ", uploadArrivalRate=" + uploadArrivalRate + ", TimePatternId=" + TimePatternId
 				+ ", totalSubscribeNmuber=" + totalSubscribeNmuber + ", popular=" + popular + "]";
 	}
 

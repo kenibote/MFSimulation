@@ -4,6 +4,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.junit.Test;
+
+import java.io.*;
 import java.util.*;
 
 import sql.Creater;
@@ -76,6 +78,54 @@ public class GenerateCreaterUser {
 	}
 
 	@Test
+	public void generateCreaterArrivalRate() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+		Random random = new Random();
+
+		for (int id = 1; id <= TotalCreaterNumber; id++) {
+			Creater c = session.get(Creater.class, id);
+
+			// 高活跃度创作者的上传频率更高。 这样平均每日的到达率在1000附近
+			if (id <= TotalCreaterNumber * popular_ratio) {
+				c.setUploadArrivalRate(random.nextDouble() + 1.3);
+			} else {
+				c.setUploadArrivalRate(random.nextDouble() + 0.3);
+			}
+		}
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
+	public void assignCreaterTimePattern() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+		Random random = new Random();
+
+		for (int id = 1; id <= TotalCreaterNumber; id++) {
+			Creater c = session.get(Creater.class, id);
+
+			// 高活跃度的创作者服从真实分布，地活跃度的创作者时间更均摊
+			if (id <= TotalCreaterNumber * popular_ratio * 2) {
+				c.setTimePatternId(random.nextInt(32) + 2);
+			} else {
+				c.setTimePatternId(1);
+			}
+		}
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
 	// 平坦时间分布 id = 1
 	public void TimePattern_1_flat() {
 		Session session = DataBaseTool.getSession();
@@ -88,6 +138,42 @@ public class GenerateCreaterUser {
 		}
 
 		session.save(up);
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
+	public void LoadRealTimePattern() throws Exception {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+
+		int id = 2;
+		Scanner file = new Scanner(
+				new FileReader(new File("/Users/kenibote/Documents/workspace/MFSimulation/CreaterTime.csv")));
+		System.out.println(file.nextLine());
+
+		while (file.hasNextLine()) {
+			String[] comp = file.nextLine().split(",");
+			double sum = 0;
+			TreeMap<Integer, Double> temp = new TreeMap<>();
+			for (int slot = 0; slot < 24; slot++) {
+				temp.put(slot, Double.parseDouble(comp[slot + 1]));
+				sum = sum + temp.get(slot);
+			}
+
+			TimePattern up = new TimePattern(id++, comp[0]);
+			for (int slot = 0; slot < 24; slot++) {
+				up.getPattern().put(slot, temp.get(slot) / sum);
+			}
+			session.save(up);
+
+		}
+
+		file.close();
 
 		// ------------------------------------------
 		tx.commit();
@@ -150,19 +236,19 @@ public class GenerateCreaterUser {
 	public static HashSet<OneND> getOneND() {
 		HashSet<OneND> data = new HashSet<>();
 
-		data.add(new OneND(2, "OneND_dinner_18_15", 18.0, 1.5));
-		data.add(new OneND(3, "OneND_dinner_18_20", 18.0, 2.0));
-		data.add(new OneND(4, "OneND_dinner_18_25", 18.0, 2.5));
-		data.add(new OneND(5, "OneND_dinner_19_15", 19.0, 1.5));
-		data.add(new OneND(6, "OneND_dinner_19_20", 19.0, 2.0));
-		data.add(new OneND(7, "OneND_dinner_19_25", 19.0, 2.5));
+		data.add(new OneND(22, "OneND_dinner_17_15", 17.0, 1.5));
+		data.add(new OneND(23, "OneND_dinner_17_20", 17.0, 2.0));
+		data.add(new OneND(24, "OneND_dinner_17_25", 17.0, 2.5));
+		data.add(new OneND(25, "OneND_dinner_18_15", 18.0, 1.5));
+		data.add(new OneND(26, "OneND_dinner_18_20", 18.0, 2.0));
+		data.add(new OneND(27, "OneND_dinner_18_25", 18.0, 2.5));
 
-		data.add(new OneND(8, "OneND_noon_11_15", 11.0, 1.5));
-		data.add(new OneND(9, "OneND_noon_11_20", 11.0, 2.0));
-		data.add(new OneND(10, "OneND_noon_11_25", 11.0, 2.5));
-		data.add(new OneND(11, "OneND_noon_12_15", 12.0, 1.5));
-		data.add(new OneND(12, "OneND_noon_12_20", 12.0, 2.0));
-		data.add(new OneND(13, "OneND_noon_12_25", 12.0, 2.5));
+		data.add(new OneND(28, "OneND_noon_10_15", 10.0, 1.5));
+		data.add(new OneND(29, "OneND_noon_10_20", 10.0, 2.0));
+		data.add(new OneND(30, "OneND_noon_10_25", 10.0, 2.5));
+		data.add(new OneND(31, "OneND_noon_11_15", 11.0, 1.5));
+		data.add(new OneND(32, "OneND_noon_11_20", 11.0, 2.0));
+		data.add(new OneND(33, "OneND_noon_11_25", 11.0, 2.5));
 
 		return data;
 	}
@@ -199,7 +285,7 @@ public class GenerateCreaterUser {
 		comb1.put(NormalDistribution(17, 0.7), 1.0);
 		comb1.put(NormalDistribution(20, 1.8), 4.0);
 
-		data.put(14, comb1);
+		data.put(34, comb1);
 
 		return data;
 	}
@@ -248,8 +334,8 @@ public class GenerateCreaterUser {
 		Transaction tx = session.beginTransaction();
 		// ------------------------------------------
 
-		// int[] delList = { 2,3,4,5,6,7,8,9,10,11,12,13 };
-		int[] delList = { 14 };
+		int[] delList = { 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34 };
+		// int[] delList = { 14 };
 		for (int id : delList) {
 			TimePattern up = session.get(TimePattern.class, id);
 			session.delete(up);
@@ -272,7 +358,7 @@ public class GenerateCreaterUser {
 		// 测试次数
 		int sum = 100000;
 
-		TimePattern up = session.get(TimePattern.class, 14);
+		TimePattern up = session.get(TimePattern.class, 34);
 		for (int i = 1; i <= sum; i++) {
 			Date date = up.getRandomTime(1, 1);
 
