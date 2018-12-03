@@ -26,7 +26,7 @@ public class GenerateCreaterUser {
 	 */
 
 	@Test
-	// 第一步：生成基本creater的信息；
+	// 第一步：生成基本creater的信息； id, name, zipfLike, popular
 	public void generateBasicCreaterInfo() {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
@@ -76,7 +76,7 @@ public class GenerateCreaterUser {
 	}
 
 	@Test
-	// 平坦时间分布
+	// 平坦时间分布 id = 1
 	public void TimePattern_1_flat() {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
@@ -110,8 +110,8 @@ public class GenerateCreaterUser {
 		}
 	}
 
-	// 生成正态分布函数
-	public TreeMap<Integer, Double> NormalDistribution(double u, double o) {
+	// 生成正态分布函数 24小时循环
+	public static TreeMap<Integer, Double> NormalDistribution(double u, double o) {
 		TreeMap<Integer, Double> treeMap = new TreeMap<>();
 		LinkedList<Double> list = new LinkedList<>();
 		double sum = 0.0;
@@ -157,17 +157,18 @@ public class GenerateCreaterUser {
 		data.add(new OneND(6, "OneND_dinner_19_20", 19.0, 2.0));
 		data.add(new OneND(7, "OneND_dinner_19_25", 19.0, 2.5));
 
-		data.add(new OneND(8, "OneND_noon_11_15", 11, 1.5));
-		data.add(new OneND(9, "OneND_noon_11_20", 11, 2.0));
-		data.add(new OneND(10, "OneND_noon_11_25", 11, 2.5));
-		data.add(new OneND(11, "OneND_noon_12_15", 12, 1.5));
-		data.add(new OneND(12, "OneND_noon_12_20", 12, 2.0));
-		data.add(new OneND(13, "OneND_noon_12_25", 12, 2.5));
+		data.add(new OneND(8, "OneND_noon_11_15", 11.0, 1.5));
+		data.add(new OneND(9, "OneND_noon_11_20", 11.0, 2.0));
+		data.add(new OneND(10, "OneND_noon_11_25", 11.0, 2.5));
+		data.add(new OneND(11, "OneND_noon_12_15", 12.0, 1.5));
+		data.add(new OneND(12, "OneND_noon_12_20", 12.0, 2.0));
+		data.add(new OneND(13, "OneND_noon_12_25", 12.0, 2.5));
 
 		return data;
 	}
 
 	@Test
+	// 生成单一正态时间分布
 	public void TimePattern_One_ND() {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
@@ -190,45 +191,49 @@ public class GenerateCreaterUser {
 		DataBaseTool.closeSessionFactory();
 	}
 
+	public static HashMap<Integer, HashMap<TreeMap<Integer, Double>, Double>> MoreND_data() {
+		HashMap<Integer, HashMap<TreeMap<Integer, Double>, Double>> data = new HashMap<>();
+
+		HashMap<TreeMap<Integer, Double>, Double> comb1 = new HashMap<>();
+		comb1.put(NormalDistribution(11, 1.8), 3.0);
+		comb1.put(NormalDistribution(17, 0.7), 1.0);
+		comb1.put(NormalDistribution(20, 1.8), 4.0);
+
+		data.put(14, comb1);
+
+		return data;
+	}
+
 	@Test
 	public void TimePattern_More_ND() {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
 		// ------------------------------------------
 
-		TreeMap<Integer, Double> nd1 = NormalDistribution(11, 1.8);
-		TreeMap<Integer, Double> nd2 = NormalDistribution(17, 0.7);
-		TreeMap<Integer, Double> nd3 = NormalDistribution(20, 1.8);
+		HashMap<Integer, HashMap<TreeMap<Integer, Double>, Double>> data = MoreND_data();
 
-		TreeMap<Integer, Double> com = new TreeMap<>();
-		double sum = 0;
-		for (int i = 0; i < 24; i++) {
-			double value = 3 * nd1.get(i) + 1 * nd2.get(i) + 4 * nd3.get(i);
-			sum = sum + value;
-			com.put(i, value);
+		for (int id : data.keySet()) {
+			HashMap<TreeMap<Integer, Double>, Double> comb = data.get(id);
+			TimePattern up = new TimePattern(id, "MoreND_" + id);
+
+			TreeMap<Integer, Double> temp = new TreeMap<>();
+			double sum = 0;
+
+			for (int slot = 0; slot < 24; slot++) {
+				double value = 0;
+				for (TreeMap<Integer, Double> nd : comb.keySet()) {
+					value = value + comb.get(nd) * nd.get(slot);
+				}
+				temp.put(slot, value);
+				sum = sum + value;
+			}
+
+			for (int slot = 0; slot < 24; slot++) {
+				up.getPattern().put(slot, temp.get(slot) / sum);
+			}
+
+			session.save(up);
 		}
-
-		TimePattern up = new TimePattern(14, "test_more_nd");
-		for (int i = 0; i < 24; i++) {
-			up.getPattern().put(i, com.get(i) / sum);
-		}
-
-		session.save(up);
-
-		// ------------------------------------------
-		tx.commit();
-		session.close();
-		DataBaseTool.closeSessionFactory();
-	}
-
-	@Test
-	public void DeleteTimePatternOnce() {
-		Session session = DataBaseTool.getSession();
-		Transaction tx = session.beginTransaction();
-		// ------------------------------------------
-
-		TimePattern up = session.get(TimePattern.class, 14);
-		session.delete(up);
 
 		// ------------------------------------------
 		tx.commit();
@@ -242,8 +247,10 @@ public class GenerateCreaterUser {
 		Transaction tx = session.beginTransaction();
 		// ------------------------------------------
 
-		for (OneND ond : getOneND()) {
-			TimePattern up = session.get(TimePattern.class, ond.id);
+		// int[] delList = { 2,3,4,5,6,7,8,9,10,11,12,13 };
+		int[] delList = { 14 };
+		for (int id : delList) {
+			TimePattern up = session.get(TimePattern.class, id);
 			session.delete(up);
 		}
 
@@ -264,7 +271,7 @@ public class GenerateCreaterUser {
 		// 测试次数
 		int sum = 100000;
 
-		TimePattern up = session.get(TimePattern.class, 5);
+		TimePattern up = session.get(TimePattern.class, 14);
 		for (int i = 1; i <= sum; i++) {
 			Date date = up.getRandomTime(1, 1);
 
@@ -288,6 +295,7 @@ public class GenerateCreaterUser {
 	}
 
 	@Test
+	// 产生基本的User信息
 	public void generateUserBasicInfo() {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
