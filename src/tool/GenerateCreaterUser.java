@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.io.*;
 import java.util.*;
 
+import sql.CacheEnable;
 import sql.Creater;
 import sql.Popular;
 import sql.TimePattern;
@@ -21,6 +22,7 @@ public class GenerateCreaterUser {
 	static double popular_ratio = 0.2;
 	static int zoneNumber = 4;
 	static int[] userNumber = { 0, 2500, 2500, 2500, 2500 };
+	static int TotalUserNumber = 10000;
 
 	// TODO Questions:
 	/*
@@ -381,6 +383,49 @@ public class GenerateCreaterUser {
 			}
 			session.flush();
 			session.clear();
+		}
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
+	public void setUserWatchProbability() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+
+		for (int id = 1; id <= TotalUserNumber; id++) {
+			User user = session.get(User.class, id);
+			user.setWatchDayProbability(5.0 / 7);
+		}
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
+	public void setCacheEnable() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+		Random random = new Random();
+
+		for (int id = 1; id <= TotalUserNumber; id++) {
+			User user = session.get(User.class, id);
+			int value = (int) (random.nextDouble() * 100);
+
+			// 约60%的人会进行缓存
+			if (value <= 60) {
+				user.setCacheEnable(CacheEnable.YES);
+			} else {
+				user.setCacheEnable(CacheEnable.NO);
+			}
+
 		}
 
 		// ------------------------------------------
