@@ -14,7 +14,7 @@ public class Task {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long taskid;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date date;
 
 	private int priority;
