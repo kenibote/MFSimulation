@@ -30,7 +30,7 @@
 11, 为创作者统计订阅信息： tool.GenerateCreaterUser.analysisCreaterSubInfo()
 
 -----------------------------------------------------------------------------------
-准备任务数据 存放在MySQL time_line_info中：
+12， 准备任务数据 存放在MySQL time_line_info中：
 	1）准备MEC冲整理任务： tool.GenerateTimeLine.generateMEC_Arrange_Task()
 	2）准备负载检查任务：tool.GenerateTimeLine.generateMEC_Check_Task()
 	3）准备创作者上传任务： tool.GenerateTimeLine.generateCreaterUploadTask()
@@ -41,19 +41,26 @@
 	
 		一些测试工具：
 			测试泊松分布： tool.GenerateTimeLine.TestPosion()
+			区域单日每小时点击分布可视化： tool.GenerateTimeLine.TestUserRequestPattern()
+			区域每天点击总量分析：tool.GenerateTimeLine.TestZoneTotalRequest()
+			用户每天播放量分析：
 
 -----------------------------------------------------------------------------------
-准备Redis缓存数据：
-	tool.RedisTool.initRedis()
+13, 准备Redis缓存数据：
+		tool.RedisTool.initRedis()
 
-
+-----------------------------------------------------------------------------------
+14, 主函数： 
+	mainfunction.StartHere.main(String[])
 
 -----------------------------------------------------------------------------------
 Task的逻辑处理函数
 
 	一些工具：
 		随机选择函数：
+		
+	数据分析工具：
+		负载分析：
+		QoS分析：
 
-
------------------------------------------------------------------------------------
-主函数
+	

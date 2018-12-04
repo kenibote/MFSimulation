@@ -7,6 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.time.Day;
 import org.jfree.data.time.Hour;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -262,6 +263,47 @@ public class GenerateTimeLine {
 		timeseriescollection.addSeries(timeseries);
 
 		DrawPicture.DrawTimeLine(timeseriescollection, "CheckTimePattern", "Hour", "Request");
+		DrawPicture.waitExit();
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@SuppressWarnings({ "deprecation", "unchecked" })
+	@Test
+	public void TestZoneTotalRequest() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+
+		int start_day = 3;
+		String zoneName = "Zone_1";
+		int[] count = new int[EndDay + 1];
+
+		Criteria criteria = session.createCriteria(Task.class);
+		criteria.add(Restrictions.eq("priority", TaskType.Request.ordinal()));
+		criteria.add(Restrictions.eq("zoneName", zoneName));
+
+		List<Task> tasklist = criteria.list();
+		int watch_count = 1;
+		for (Task task : tasklist) {
+			count[task.getDate().getDay()]++;
+			watch_count++;
+			if (watch_count % 10000 == 0)
+				System.out.print("#");
+		}
+
+		// 画图
+		TimeSeries timeseries = new TimeSeries("Request Count per Day " + zoneName);
+		for (int day = start_day; day <= EndDay; day++) {
+			timeseries.add(new Day(day, 1, 2018), count[day]);
+		}
+		TimeSeriesCollection timeseriescollection = new TimeSeriesCollection();
+		timeseriescollection.addSeries(timeseries);
+
+		DrawPicture.DrawTimeLine(timeseriescollection, "CheckTimePattern", "Day", "Request");
 		DrawPicture.waitExit();
 
 		// ------------------------------------------
