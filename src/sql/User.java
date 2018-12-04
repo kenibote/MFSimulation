@@ -26,7 +26,7 @@ public class User {
 
 	private String cacheAddress;
 
-	private String TimePatternName;
+	private Integer TimePatternId;
 
 	private Double watchDayProbability;
 
@@ -95,12 +95,12 @@ public class User {
 		this.cacheAddress = cacheAddress;
 	}
 
-	public String getTimePatternName() {
-		return TimePatternName;
+	public Integer getTimePatternId() {
+		return TimePatternId;
 	}
 
-	public void setTimePatternName(String timePatternName) {
-		TimePatternName = timePatternName;
+	public void setTimePatternId(Integer timePatternId) {
+		TimePatternId = timePatternId;
 	}
 
 	public Double getWatchDayProbability() {
@@ -116,7 +116,7 @@ public class User {
 		return "User [userId=" + userId + ", userName=" + userName + ", belongZoneName=" + belongZoneName
 				+ ", totalSubscribeNumber=" + totalSubscribeNumber + ", watchTimeWeek=" + watchTimeWeek
 				+ ", cacheEnable=" + cacheEnable + ", cacheAddress=" + cacheAddress + ", TimePatternName="
-				+ TimePatternName + ", watchDayProbability=" + watchDayProbability + "]";
+				+ TimePatternId + ", watchDayProbability=" + watchDayProbability + "]";
 	}
 
 }

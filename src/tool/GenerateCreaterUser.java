@@ -449,14 +449,17 @@ public class GenerateCreaterUser {
 		// ------------------------------------------
 
 		for (int user_id = 1; user_id <= TotalUserNumber; user_id++) {
-			session.get(User.class, user_id).setTotalSubscribeNumber(0);
+			User user = session.get(User.class, user_id);
+			user.setTotalSubscribeNumber(0);
+			user.setTimePatternId(0);
+			user.setWatchTimeWeek(0);
 		}
 
 		for (int cr_id = 1; cr_id <= TotalCreaterNumber; cr_id++) {
 			Creater creater = session.get(Creater.class, cr_id);
+			creater.setTotalSubscribeNmuber(0);
 			creater.getSubscribers().clear();
 			creater.getZoneSubscribeNumber().clear();
-			creater.setTotalSubscribeNmuber(0);
 		}
 
 		// ------------------------------------------
@@ -530,6 +533,43 @@ public class GenerateCreaterUser {
 				user.setCacheEnable(CacheEnable.YES);
 			} else {
 				user.setCacheEnable(CacheEnable.NO);
+			}
+
+		}
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
+	public void analysisCreaterSubInfo() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+
+		for (int c_id = 1; c_id <= TotalCreaterNumber; c_id++) {
+			Creater creater = session.get(Creater.class, c_id);
+			
+			// 设置总订阅数
+			creater.setTotalSubscribeNmuber(creater.getSubscribers().size());
+
+			HashMap<String, Integer> zone_info = new HashMap<>();
+			for (int i = 1; i <= 4; i++) {
+				zone_info.put("Zone_" + i, 0);
+			}
+
+			// 统计每个zone的订阅数
+			for (int u_id : creater.getSubscribers()) {
+				String zone_name = session.get(User.class, u_id).getBelongZoneName();
+				int value = zone_info.get(zone_name) + 1;
+				zone_info.put(zone_name, value);
+			}
+
+			// 同步信息
+			for (String zone_name : zone_info.keySet()) {
+				creater.getZoneSubscribeNumber().put(zone_name, zone_info.get(zone_name));
 			}
 
 		}

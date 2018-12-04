@@ -28,10 +28,10 @@ public class Creater {
 
 	@ElementCollection(targetClass = Integer.class)
 	@CollectionTable(name = "creater_zoneNumber_info", joinColumns = @JoinColumn(name = "createrId", nullable = false))
-	@MapKeyColumn(name = "zoneId")
-	@MapKeyClass(Integer.class)
+	@MapKeyColumn(name = "zoneName")
+	@MapKeyClass(String.class)
 	@Column(name = "subscribeNumber", nullable = false)
-	private Map<Integer, Integer> zoneSubscribeNumber = new HashMap<>();
+	private Map<String, Integer> zoneSubscribeNumber = new HashMap<>();
 
 	@ElementCollection(targetClass = Integer.class)
 	@CollectionTable(name = "creater_subscriber_info", joinColumns = @JoinColumn(name = "createrId", nullable = false))
@@ -103,11 +103,11 @@ public class Creater {
 		this.popular = popular;
 	}
 
-	public Map<Integer, Integer> getZoneSubscribeNumber() {
+	public Map<String, Integer> getZoneSubscribeNumber() {
 		return zoneSubscribeNumber;
 	}
 
-	public void setZoneSubscribeNumber(Map<Integer, Integer> zoneSubscribeNumber) {
+	public void setZoneSubscribeNumber(Map<String, Integer> zoneSubscribeNumber) {
 		this.zoneSubscribeNumber = zoneSubscribeNumber;
 	}
 
