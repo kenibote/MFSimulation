@@ -392,6 +392,112 @@ public class GenerateCreaterUser {
 	}
 
 	@Test
+	public void gengerateSubscribeInfoForUser() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+		HashMap<Integer, Double> zipfMap = new HashMap<>();
+		double sum = 0.0;
+		for (int i = 1; i <= TotalCreaterNumber; i++) {
+			double value = 1 / Math.pow(i, zipfAlpha);
+			sum = sum + value;
+			zipfMap.put(i, value);
+		}
+
+		double bond = 0;
+		TreeMap<Double, Integer> rank = new TreeMap<>();
+		for (int id = 1; id <= TotalCreaterNumber; id++) {
+			rank.put(bond, id);
+			bond = bond + zipfMap.get(id) / sum;
+		}
+
+		// 准备随机数
+		Random random = new Random();
+
+		for (int user_id = 1; user_id <= TotalUserNumber; user_id++) {
+			User user = session.get(User.class, user_id);
+			int sub_number = (int) (random.nextGaussian() * 15 + 100);
+			// 监测使用
+			System.out.println("ID:" + user.getUserId() + " sub_number:" + sub_number);
+
+			// 设置用户总订阅数
+			user.setTotalSubscribeNumber(sub_number);
+
+			// 根据订阅数，按照zipf分布生成订阅id
+			HashSet<Integer> user_sub_id = new HashSet<>();
+			while (user_sub_id.size() < sub_number) {
+				int cr_id = rank.floorEntry(random.nextDouble()).getValue();
+				user_sub_id.add(cr_id);
+			}
+
+			// 更新创作者的信息
+			for (int cr_id : user_sub_id) {
+				session.get(Creater.class, cr_id).getSubscribers().add(user.getUserId());
+			}
+		}
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
+	public void deleteSubscribeInfoForUser() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+
+		for (int user_id = 1; user_id <= TotalUserNumber; user_id++) {
+			session.get(User.class, user_id).setTotalSubscribeNumber(0);
+		}
+
+		for (int cr_id = 1; cr_id <= TotalCreaterNumber; cr_id++) {
+			Creater creater = session.get(Creater.class, cr_id);
+			creater.getSubscribers().clear();
+			creater.getZoneSubscribeNumber().clear();
+			creater.setTotalSubscribeNmuber(0);
+		}
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
+	public void TestGussDistribution() {
+
+		Random random = new Random();
+		int sum = 10000;
+
+		TreeMap<Integer, Integer> count = new TreeMap<>();
+
+		for (int i = 1; i <= sum; i++) {
+			int target = (int) (random.nextGaussian() * 15 + 100);
+
+			if (!count.containsKey(target)) {
+				count.put(target, 0);
+			}
+
+			int val = count.get(target) + 1;
+			count.put(target, val);
+		}
+
+		// Prepare data
+		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+		for (int i : count.keySet()) {
+			System.out.println(i);
+			dataset.addValue(count.get(i) / (double) sum, "Value", "" + i);
+		}
+
+		// 画图
+		DrawPicture.DrawChart(dataset, "Propability Count", "Time", "Count");
+		DrawPicture.waitExit();
+
+	}
+
+	@Test
 	public void setUserWatchProbability() {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();

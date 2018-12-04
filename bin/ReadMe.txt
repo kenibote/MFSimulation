@@ -17,7 +17,11 @@
 4， 为创作者设置创作时间分布： tool.GenerateCreaterUser.assignCreaterTimePattern()
 
 5, 生成用户基本信息： tool.GenerateCreaterUser.generateUserBasicInfo()
-6, 为用户生成订阅者信息：
+6, 为用户生成订阅者信息： tool.GenerateCreaterUser.gengerateSubscribeInfoForUser()
+	测试工具：
+		用户订阅数高斯分布图形化工具： tool.GenerateCreaterUser.TestGussDistribution()
+		删除用户订阅信息： tool.GenerateCreaterUser.deleteSubscribeInfoForUser()
+
 7, 为用户生成观看总时间信息：
 8, 为用户设定观看概率信息； tool.GenerateCreaterUser.setUserWatchProbability()
 9, 为用户指定观看时间分布信息：
