@@ -1,7 +1,5 @@
 package demo;
 
-import java.util.*;
-
 import redis.clients.jedis.Jedis;
 
 public class JTest {

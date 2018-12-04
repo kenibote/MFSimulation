@@ -34,6 +34,7 @@ public class Demo {
 		sessionFactory.close();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void DateTest() {
 		Date d = new Date(2018 - 1900, 1, 1, 23, 26, 0);

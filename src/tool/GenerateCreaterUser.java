@@ -42,25 +42,7 @@ public class GenerateCreaterUser {
 		}
 
 		for (int i = 1; i <= TotalCreaterNumber; i++) {
-			String pix = "";
-			int len = ("" + i).length();
-
-			switch (len) {
-			case 1:
-				pix = "000" + i;
-				break;
-			case 2:
-				pix = "00" + i;
-				break;
-			case 3:
-				pix = "0" + i;
-				break;
-			case 4:
-				pix = "" + i;
-				break;
-			}
-
-			Creater c = new Creater(i, "Creater_" + pix);
+			Creater c = new Creater(i, "Creater_" + GenerateTimeLine.getFormateNumber(i, 4));
 			double value = map.get(i) / sum;
 			c.setZipfLike(value);
 			if (i <= TotalCreaterNumber * popular_ratio) {
@@ -92,30 +74,6 @@ public class GenerateCreaterUser {
 				c.setUploadArrivalRate(random.nextDouble() + 1.3);
 			} else {
 				c.setUploadArrivalRate(random.nextDouble() + 0.3);
-			}
-		}
-
-		// ------------------------------------------
-		tx.commit();
-		session.close();
-		DataBaseTool.closeSessionFactory();
-	}
-
-	@Test
-	public void assignCreaterTimePattern() {
-		Session session = DataBaseTool.getSession();
-		Transaction tx = session.beginTransaction();
-		// ------------------------------------------
-		Random random = new Random();
-
-		for (int id = 1; id <= TotalCreaterNumber; id++) {
-			Creater c = session.get(Creater.class, id);
-
-			// 高活跃度的创作者服从真实分布，地活跃度的创作者时间更均摊
-			if (id <= TotalCreaterNumber * popular_ratio * 2) {
-				c.setTimePatternId(random.nextInt(32) + 2);
-			} else {
-				c.setTimePatternId(1);
 			}
 		}
 
@@ -358,6 +316,7 @@ public class GenerateCreaterUser {
 		// 测试次数
 		int sum = 100000;
 
+		// 此处设置需要测试的id
 		TimePattern up = session.get(TimePattern.class, 34);
 		for (int i = 1; i <= sum; i++) {
 			Date date = up.getRandomTime(1, 1);
@@ -382,6 +341,30 @@ public class GenerateCreaterUser {
 	}
 
 	@Test
+	public void assignCreaterTimePattern() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+		Random random = new Random();
+
+		for (int id = 1; id <= TotalCreaterNumber; id++) {
+			Creater c = session.get(Creater.class, id);
+
+			// 高活跃度的创作者服从真实分布，地活跃度的创作者时间更均摊
+			if (id <= TotalCreaterNumber * popular_ratio * 2) {
+				c.setTimePatternId(random.nextInt(32) + 2);
+			} else {
+				c.setTimePatternId(1);
+			}
+		}
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
 	// 产生基本的User信息 id, name, zone, cache_address
 	public void generateUserBasicInfo() {
 		Session session = DataBaseTool.getSession();
@@ -391,25 +374,7 @@ public class GenerateCreaterUser {
 		int id = 1;
 		for (int z = 1; z <= zoneNumber; z++) {
 			for (int i = 1; i <= userNumber[z]; i++) {
-				String pix = "";
-				int len = ("" + i).length();
-
-				switch (len) {
-				case 1:
-					pix = "000" + i;
-					break;
-				case 2:
-					pix = "00" + i;
-					break;
-				case 3:
-					pix = "0" + i;
-					break;
-				case 4:
-					pix = "" + i;
-					break;
-				}
-
-				User user = new User(id++, "User_" + z + "_" + pix);
+				User user = new User(id++, "User_" + z + "_" + GenerateTimeLine.getFormateNumber(i, 4));
 				user.setBelongZoneName("Zone_" + z);
 				user.setCacheAddress("ContentCache_" + user.getUserName());
 				session.save(user);
