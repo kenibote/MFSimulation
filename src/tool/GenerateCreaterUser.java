@@ -319,7 +319,7 @@ public class GenerateCreaterUser {
 		int sum = 100000;
 
 		// 此处设置需要测试的id
-		TimePattern up = session.get(TimePattern.class, 34);
+		TimePattern up = session.get(TimePattern.class, 17);
 		for (int i = 1; i <= sum; i++) {
 			Date date = up.getRandomTime(1, 1);
 
@@ -501,6 +501,47 @@ public class GenerateCreaterUser {
 	}
 
 	@Test
+	public void generateTotalWatchTimeforUser() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+		Random random = new Random();
+
+		for (int id = 1; id <= TotalUserNumber; id++) {
+			User user = session.get(User.class, id);
+
+			// 范围是 0.8 ~ 1.2 之间
+			double ratio = random.nextDouble() * 0.4 + 0.8;
+			int watchTime = (int) (user.getTotalSubscribeNumber() * 5 * ratio);
+			user.setWatchTimeWeek(watchTime);
+		}
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
+	public void setUserWatchPattern() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+
+		for (int id = 1; id <= TotalUserNumber; id++) {
+			User user = session.get(User.class, id);
+
+			// 目前是固定的用户请求模式
+			user.setTimePatternId(34);
+		}
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
 	public void setUserWatchProbability() {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
@@ -508,7 +549,7 @@ public class GenerateCreaterUser {
 
 		for (int id = 1; id <= TotalUserNumber; id++) {
 			User user = session.get(User.class, id);
-			user.setWatchDayProbability(5.0 / 7);
+			user.setWatchDayProbability(5.0 / 7.0);
 		}
 
 		// ------------------------------------------
@@ -551,7 +592,7 @@ public class GenerateCreaterUser {
 
 		for (int c_id = 1; c_id <= TotalCreaterNumber; c_id++) {
 			Creater creater = session.get(Creater.class, c_id);
-			
+
 			// 设置总订阅数
 			creater.setTotalSubscribeNmuber(creater.getSubscribers().size());
 

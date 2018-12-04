@@ -22,9 +22,9 @@
 		删除用户订阅信息： tool.GenerateCreaterUser.deleteSubscribeInfoForUser()
 		用户订阅数高斯分布图形化工具： tool.GenerateCreaterUser.TestGussDistribution()
 
-7, 为用户生成观看总时间信息：
-8, 为用户设定观看概率信息； tool.GenerateCreaterUser.setUserWatchProbability()
-9, 为用户指定观看时间分布信息：
+7, 为用户生成观看总时间信息：tool.GenerateCreaterUser.generateTotalWatchTimeforUser()
+8, 为用户指定观看时间分布信息：tool.GenerateCreaterUser.setUserWatchPattern()
+9, 为用户设定观看概率信息； tool.GenerateCreaterUser.setUserWatchProbability()
 10, 为用户设定是否缓存信息；tool.GenerateCreaterUser.setCacheEnable()
 
 11, 为创作者统计订阅信息： tool.GenerateCreaterUser.analysisCreaterSubInfo()
