@@ -190,13 +190,14 @@ public class GenerateTimeLine {
 					}
 
 				} // end if
-				
-				if(u_id%1000==0)
+
+				if (u_id % 1000 == 0)
 					System.out.print("#");
 			} // end for user
-			
+
 			// 重新开启任务
 			tx.commit();
+			session.clear();
 			tx = session.beginTransaction();
 
 			System.out.println("Done");
@@ -240,7 +241,7 @@ public class GenerateTimeLine {
 		long time_start = new Date(2018 - 1900, 0, day, 0, 0, 0).getTime();
 		long time_end = new Date(2018 - 1900, 0, day + 1, 0, 0, 0).getTime();
 
-		Criteria criteria = session.createCriteria(TimerTask.class);
+		Criteria criteria = session.createCriteria(Task.class);
 		criteria.add(Restrictions.eq("priority", TaskType.Request.ordinal()));
 		criteria.add(Restrictions.eq("zoneName", zoneName));
 		criteria.add(Restrictions.gt("time", time_start));
