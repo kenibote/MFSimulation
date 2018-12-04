@@ -104,14 +104,14 @@ public class GenerateTimeLine {
 				uploadNumber[day] = getPossionVariable(creater.getUploadArrivalRate());
 			}
 
+			int contentcount = 1;
 			// 为每一天创建task
 			for (int day = 1; day <= EndDay; day++) {
 				String pix = "C_2018_01_" + getFormateNumber(day, 2) + "_" + creater.getCreaterName() + "_";
 
-				int daycount = 1;
 				// 如果该天有多个上传任务
 				while (uploadNumber[day]-- > 0) {
-					String contentName = pix + getFormateNumber(daycount++, 3);
+					String contentName = pix + getFormateNumber(contentcount++, 3);
 
 					Task task = new Task();
 					task.setPriority(TaskType.Upload.ordinal());
@@ -135,19 +135,6 @@ public class GenerateTimeLine {
 		DataBaseTool.closeSessionFactory();
 	}
 
-	public static String getFormateNumber(int data, int len) {
-		int length = ("" + data).length();
-		String res = "";
-
-		len = len - length;
-		while (len-- > 0) {
-			res = res + "0";
-		}
-		res = res + data;
-
-		return res;
-	}
-
 	@SuppressWarnings({ "deprecation", "unchecked" })
 	@Test
 	public void transferTasktoRedis() {
@@ -166,6 +153,19 @@ public class GenerateTimeLine {
 		tx.commit();
 		session.close();
 		DataBaseTool.closeSessionFactory();
+	}
+
+	public static String getFormateNumber(int data, int len) {
+		int length = ("" + data).length();
+		String res = "";
+
+		len = len - length;
+		while (len-- > 0) {
+			res = res + "0";
+		}
+		res = res + data;
+
+		return res;
 	}
 
 	@Test
