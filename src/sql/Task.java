@@ -34,8 +34,9 @@ public class Task {
 	private int upload_id; // 上传者id
 	private String upload_content; // 上传内容的name
 
-	// TODO 请求任务
+	// 请求任务
 	private int user_id;
+	private String zoneName;
 
 	// 监测任务
 
@@ -120,6 +121,14 @@ public class Task {
 
 	public void setUser_id(int user_id) {
 		this.user_id = user_id;
+	}
+	
+	public String getZoneName() {
+		return zoneName;
+	}
+
+	public void setZoneName(String zoneName) {
+		this.zoneName = zoneName;
 	}
 
 	@Override

@@ -30,18 +30,18 @@
 11, 为创作者统计订阅信息： tool.GenerateCreaterUser.analysisCreaterSubInfo()
 
 -----------------------------------------------------------------------------------
-准备任务数据：
+准备任务数据 存放在MySQL time_line_info中：
 	1）准备MEC冲整理任务： tool.GenerateTimeLine.generateMEC_Arrange_Task()
 	2）准备负载检查任务：tool.GenerateTimeLine.generateMEC_Check_Task()
 	3）准备创作者上传任务： tool.GenerateTimeLine.generateCreaterUploadTask()
-	4）准备用户请求任务： 
+	4）准备用户请求任务： tool.GenerateTimeLine.generateUserRequestTest()
 	5）资源释放任务会在程序仿真中动态创建
+	
 	6）将数据转移到Redis: tool.GenerateTimeLine.transferTasktoRedis()
 	
 		一些测试工具：
 			测试泊松分布： tool.GenerateTimeLine.TestPosion()
 
-			
 -----------------------------------------------------------------------------------
 准备Redis缓存数据：
 	tool.RedisTool.initRedis()

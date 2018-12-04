@@ -15,6 +15,7 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.xy.XYDataset;
 
 public class DrawPicture {
 	static int width = 800;
@@ -54,6 +55,20 @@ public class DrawPicture {
 		// 显示图表
 		ChartPanel chartpanel = new ChartPanel(chart, true);
 		Frame(chartpanel);
+	}
+
+	public static void DrawTimeLine(XYDataset xydataset, String chartTitle, String xName, String yName) {
+
+		JFreeChart jfreechart = ChartFactory.createTimeSeriesChart(chartTitle, xName, yName, xydataset, true, true,
+				true);
+
+		// XYPlot xyplot = (XYPlot) jfreechart.getPlot();
+		// DateAxis dateaxis = (DateAxis) xyplot.getDomainAxis();
+		// dateaxis.setDateFormatOverride(new SimpleDateFormat("MMM-yyyy"));
+
+		// 显示图标
+		ChartPanel frame = new ChartPanel(jfreechart, true);
+		Frame(frame);
 	}
 
 	private static void Frame(ChartPanel panel) {

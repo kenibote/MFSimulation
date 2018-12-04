@@ -2,9 +2,14 @@ package tool;
 
 import java.util.*;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.time.Hour;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
 import org.junit.Test;
 
 import redis.clients.jedis.Jedis;
@@ -135,6 +140,65 @@ public class GenerateTimeLine {
 		DataBaseTool.closeSessionFactory();
 	}
 
+	@Test
+	public void generateUserRequestTest() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+
+		Random random = new Random();
+		// 目前没有用user中存的信息
+		double watchpro = 50.0 / 7.0;
+		TimePattern tp = session.get(TimePattern.class, 34);
+
+		// 用户请求任务从第3天开始
+		for (int day = 3; day <= EndDay; day++) {
+			// 监测使用
+			System.out.println(day);
+
+			// 为每一位用户设置请求任务
+			for (int u_id = 1; u_id <= GenerateCreaterUser.TotalUserNumber; u_id++) {
+				double whether_wahct = random.nextDouble() * 10;
+
+				// 代表今天会观看
+				if (whether_wahct < watchpro) {
+					// 获取用户的信息
+					User user = session.get(User.class, u_id);
+
+					// 得到会看多少个视频的信息
+					// 目前没有用user中存的信息
+					double ratio = random.nextDouble() * 0.4 + 0.8;
+					int watch_time = (int) (user.getTotalSubscribeNumber() * ratio);
+
+					// 产生时间点
+					HashSet<Long> time_point = new HashSet<>();
+					while (time_point.size() < watch_time) {
+						time_point.add(tp.getRandomTime(1, day).getTime());
+					}
+
+					// 根据获取的时间，创建任务
+					for (long task_time : time_point) {
+						Task task = new Task();
+						task.setTaskType(TaskType.Request);
+						task.setPriority(TaskType.Request.ordinal());
+						task.setDate(new Date(task_time));
+						task.setTime(task.getDate().getTime() + task.getPriority());
+
+						task.setUser_id(u_id);
+						task.setZoneName(user.getBelongZoneName());
+						session.save(task);
+					}
+
+				} // end if
+			} // end for user
+		} // end for day
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
 	@SuppressWarnings({ "deprecation", "unchecked" })
 	@Test
 	public void transferTasktoRedis() {
@@ -148,6 +212,47 @@ public class GenerateTimeLine {
 		for (Task task : taskList) {
 			jedis.zadd("A_Time_Line", task.getTime(), task.toJSONString());
 		}
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@SuppressWarnings({ "deprecation", "unchecked" })
+	@Test
+	public void TestUserRequestPattern() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+
+		int day = 3;
+		String zoneName = "Zone_1";
+		long time_start = new Date(2018 - 1900, 0, day, 0, 0, 0).getTime();
+		long time_end = new Date(2018 - 1900, 0, day + 1, 0, 0, 0).getTime();
+
+		Criteria criteria = session.createCriteria(TimerTask.class);
+		criteria.add(Restrictions.eq("priority", TaskType.Request.ordinal()));
+		criteria.add(Restrictions.eq("zoneName", zoneName));
+		criteria.add(Restrictions.gt("time", time_start));
+		criteria.add(Restrictions.lt("time", time_end));
+
+		int[] count = new int[24];
+		List<Task> tasklist = criteria.list();
+		for (Task task : tasklist) {
+			count[task.getDate().getHours()]++;
+		}
+
+		// 画图
+		TimeSeries timeseries = new TimeSeries("Request Count");
+		for (int i = 0; i < 24; i++) {
+			timeseries.add(new Hour(i, day, 1, 2018), count[i]);
+		}
+		TimeSeriesCollection timeseriescollection = new TimeSeriesCollection();
+		timeseriescollection.addSeries(timeseries);
+
+		DrawPicture.DrawTimeLine(timeseriescollection, "CheckTimePattern", "Hour", "Request");
+		DrawPicture.waitExit();
 
 		// ------------------------------------------
 		tx.commit();
