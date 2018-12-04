@@ -191,7 +191,7 @@ public class GenerateTimeLine {
 
 				} // end if
 				
-				if(u_id/1000==0)
+				if(u_id%1000==0)
 					System.out.print("#");
 			} // end for user
 			
