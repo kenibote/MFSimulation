@@ -190,7 +190,16 @@ public class GenerateTimeLine {
 					}
 
 				} // end if
+				
+				if(u_id/1000==0)
+					System.out.print("#");
 			} // end for user
+			
+			// 重新开启任务
+			tx.commit();
+			tx = session.beginTransaction();
+
+			System.out.println("Done");
 		} // end for day
 
 		// ------------------------------------------
