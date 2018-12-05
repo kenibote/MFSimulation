@@ -5,6 +5,7 @@ import java.util.*;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.Day;
@@ -271,7 +272,7 @@ public class GenerateTimeLine {
 		DataBaseTool.closeSessionFactory();
 	}
 
-	@SuppressWarnings({ "deprecation", "unchecked" })
+	@SuppressWarnings({ "deprecation" })
 	@Test
 	public void TestZoneTotalRequest() {
 		Session session = DataBaseTool.getSession();
@@ -293,14 +294,8 @@ public class GenerateTimeLine {
 			criteria.add(Restrictions.gt("time", time_start));
 			criteria.add(Restrictions.lt("time", time_end));
 
-			List<Task> tasklist = criteria.list();
-			int watch_count = 1;
-			for (Task task : tasklist) {
-				count[task.getDate().getDay()]++;
-				watch_count++;
-				if (watch_count % 10000 == 0)
-					System.out.print("#");
-			}
+			criteria.setProjection(Projections.rowCount());
+			count[start_day] = (int) criteria.uniqueResult();
 
 			// 清理垃圾
 			session.clear();
