@@ -17,12 +17,12 @@ import sql.User;
 public class GenerateCreaterUser {
 
 	// Configuration
-	static int TotalCreaterNumber = 1000;
-	static double zipfAlpha = 1.0;
-	static double popular_ratio = 0.2;
-	static int zoneNumber = 4;
-	static int[] userNumber = { 0, 2500, 2500, 2500, 2500 };
-	static int TotalUserNumber = 10000;
+	public static int TotalCreaterNumber = 1000;
+	public static double zipfAlpha = 1.0;
+	public static double popular_ratio = 0.2;
+	public static int zoneNumber = 4;
+	public static int[] userNumber = { 0, 2500, 2500, 2500, 2500 };
+	public static int TotalUserNumber = 10000;
 
 	// TODO Questions:
 	/*

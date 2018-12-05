@@ -36,8 +36,8 @@
 	1）准备MEC重整理任务： tool.GenerateTimeLine.generateMEC_Arrange_Task()
 	2）准备负载检查任务：tool.GenerateTimeLine.generateMEC_Check_Task()
 	3）准备创作者上传任务： tool.GenerateTimeLine.generateCreaterUploadTask()
-	4）准备用户请求任务：   tool.GenerateTimeLine.generateUserRequestTast_1()
-					    tool.GenerateTimeLine.generateUserRequestTast_2()
+	4）准备用户请求任务：  tool.GenerateTimeLine.generateUserRequestTast_1()
+					   tool.GenerateTimeLine.generateUserRequestTast_2()
 	5）资源释放任务会在程序仿真中动态创建
 	
 	6）将数据转移到Redis: tool.GenerateTimeLine.transferTasktoRedis()
@@ -55,6 +55,15 @@
 -----------------------------------------------------------------------------------
 14, 主函数： 
 	mainfunction.StartHere.main(String[])
+	
+		业务逻辑函数：
+			mainfunction.StartHere.UploadTask(Task)
+				1. 在全局以及每个zone中设置期望点击数的数据； 
+				2. 在Redis中创建地址，用于记录哪些用户缓存了该内容； 
+				3. 在Redis中每个zone中添加记录，用于记录该区域有多少份copy； 
+				4. 将该内容推送给用户的观看列表； 
+				5. 根据该用户是否是热门用户，决定是否推送到MEC中；
+			
 
 -----------------------------------------------------------------------------------
 Task的逻辑处理函数
@@ -63,6 +72,7 @@ Task的逻辑处理函数
 		随机选择函数：
 		
 	数据分析工具：
+		仿真进行过程中的数据完整性检查工具：
 		负载分析：
 		QoS分析：
 

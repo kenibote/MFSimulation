@@ -22,17 +22,17 @@ public class RedisTool {
 		redis.select(0);
 
 		// 用于存储每个内容的 global value (type = sorted set)
-		redis.zadd("A_Content_ValueGlobal", -1, "init");
+		//redis.zadd("A_Content_ValueGlobal", -1, "init");
 
 		for (int zone = 1; zone <= GenerateCreaterUser.zoneNumber; zone++) {
 			// 用于存储每个内容在每个区域内的 value (type = sorted set)
-			redis.zadd("A_Content_ValueZone_" + zone, -1, "init");
+			//redis.zadd("A_Content_ValueZone_" + zone, -1, "init");
 
 			// 用于记录每个MEC内存了哪些内容 (type = sorted set)
 			redis.zadd("A_Content_CacheMEC_" + zone, 100000, "init");
 
 			// 用于存放每个区域内，每个内容有多少份拷贝 (type = hash map)
-			redis.hset("A_Content_CopyNumberZone_" + zone, "init", "-1");
+			//redis.hset("A_Content_CopyNumberZone_" + zone, "init", "-1");
 		}
 
 		List<User> userList = session.createCriteria(User.class).list();
@@ -57,8 +57,8 @@ public class RedisTool {
 			redis.hset("A_User_AvailableState", user.getUserName(), "0");
 
 			// 初始化用户观看列表 (type = set)
-			redis.sadd("WatchList_Sub_" + user.getUserName(), "init");
-			redis.sadd("WatchList_Unsub_" + user.getUserName(), "init");
+			//redis.sadd("WatchList_Sub_" + user.getUserName(), "init");
+			//redis.sadd("WatchList_Unsub_" + user.getUserName(), "init");
 
 			// stopWatch
 			System.out.println(user.getUserId());
