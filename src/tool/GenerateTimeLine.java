@@ -144,7 +144,7 @@ public class GenerateTimeLine {
 	}
 
 	@Test
-	public void generateUserRequestTest() {
+	public void generateUserRequestTast_1() {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
 		// ------------------------------------------
@@ -202,6 +202,76 @@ public class GenerateTimeLine {
 			tx.commit();
 			session.clear();
 			tx = session.beginTransaction();
+
+			System.out.println("Done");
+		} // end for day
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
+	public void generateUserRequestTast_2() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+
+		Random random = new Random();
+		// 目前没有用user中存的信息
+		double watchpro = 50.0 / 7.0;
+		TimePattern tp = session.get(TimePattern.class, 34);
+
+		// 为每一位用户设置请求任务
+		for (int u_id = 1; u_id <= GenerateCreaterUser.TotalUserNumber; u_id++) {
+			// 获取用户的信息
+			User user = session.get(User.class, u_id);
+			// 监测使用
+			System.out.println(u_id);
+
+			// 用户请求任务从第3天开始
+			for (int day = 3; day <= EndDay; day++) {
+				double whether_watch = random.nextDouble() * 10;
+
+				// 代表今天会观看
+				if (whether_watch < watchpro) {
+					// 得到会看多少个视频的信息
+					// 目前没有用user中存的信息
+					double ratio = random.nextDouble() * 0.4 + 0.8;
+					int watch_time = (int) (user.getTotalSubscribeNumber() * ratio);
+
+					// 产生时间点
+					HashSet<Long> time_point = new HashSet<>();
+					while (time_point.size() < watch_time) {
+						time_point.add(tp.getRandomTime(1, day).getTime());
+					}
+
+					// 根据获取的时间，创建任务
+					for (long task_time : time_point) {
+						Task task = new Task();
+						task.setTaskType(TaskType.Request);
+						task.setPriority(TaskType.Request.ordinal());
+						task.setDate(new Date(task_time));
+						task.setTime(task.getDate().getTime() + task.getPriority());
+
+						task.setUser_id(u_id);
+						task.setZoneName(user.getBelongZoneName());
+						session.save(task);
+					}
+
+				} // end if
+
+				if (u_id % 1000 == 0)
+					System.out.print("#");
+			} // end for user
+
+			// 重新开启任务
+			if (u_id % 10 == 0) {
+				tx.commit();
+				session.clear();
+				tx = session.beginTransaction();
+			}
 
 			System.out.println("Done");
 		} // end for day

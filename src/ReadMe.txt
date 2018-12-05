@@ -33,10 +33,11 @@
 
 -----------------------------------------------------------------------------------
 12， 准备任务数据 存放在MySQL time_line_info中：
-	1）准备MEC冲整理任务： tool.GenerateTimeLine.generateMEC_Arrange_Task()
+	1）准备MEC重整理任务： tool.GenerateTimeLine.generateMEC_Arrange_Task()
 	2）准备负载检查任务：tool.GenerateTimeLine.generateMEC_Check_Task()
 	3）准备创作者上传任务： tool.GenerateTimeLine.generateCreaterUploadTask()
-	4）准备用户请求任务： tool.GenerateTimeLine.generateUserRequestTest()
+	4）准备用户请求任务：   tool.GenerateTimeLine.generateUserRequestTast_1()
+					    tool.GenerateTimeLine.generateUserRequestTast_2()
 	5）资源释放任务会在程序仿真中动态创建
 	
 	6）将数据转移到Redis: tool.GenerateTimeLine.transferTasktoRedis()
