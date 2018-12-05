@@ -280,23 +280,30 @@ public class GenerateTimeLine {
 
 		int start_day = 3;
 		String zoneName = "Zone_1";
-		long time_start = new Date(2018 - 1900, 0, start_day, 0, 0, 0).getTime();
-		long time_end = new Date(2018 - 1900, 0, start_day + 5, 0, 0, 0).getTime();
 		int[] count = new int[EndDay + 1];
 
-		Criteria criteria = session.createCriteria(Task.class);
-		criteria.add(Restrictions.eq("priority", TaskType.Request.ordinal()));
-		criteria.add(Restrictions.eq("zoneName", zoneName));
-		criteria.add(Restrictions.gt("time", time_start));
-		criteria.add(Restrictions.lt("time", time_end));
+		for (; start_day <= EndDay; start_day++) {
+			System.out.println(start_day + "......");
+			long time_start = new Date(2018 - 1900, 0, start_day, 0, 0, 0).getTime();
+			long time_end = new Date(2018 - 1900, 0, start_day + 1, 0, 0, 0).getTime();
 
-		List<Task> tasklist = criteria.list();
-		int watch_count = 1;
-		for (Task task : tasklist) {
-			count[task.getDate().getDay()]++;
-			watch_count++;
-			if (watch_count % 10000 == 0)
-				System.out.print("#");
+			Criteria criteria = session.createCriteria(Task.class);
+			criteria.add(Restrictions.eq("priority", TaskType.Request.ordinal()));
+			criteria.add(Restrictions.eq("zoneName", zoneName));
+			criteria.add(Restrictions.gt("time", time_start));
+			criteria.add(Restrictions.lt("time", time_end));
+
+			List<Task> tasklist = criteria.list();
+			int watch_count = 1;
+			for (Task task : tasklist) {
+				count[task.getDate().getDay()]++;
+				watch_count++;
+				if (watch_count % 10000 == 0)
+					System.out.print("#");
+			}
+
+			// 清理垃圾
+			session.clear();
 		}
 
 		// 画图

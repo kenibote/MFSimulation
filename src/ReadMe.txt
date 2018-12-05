@@ -1,4 +1,6 @@
 如何启动项目？
+	Author: Wang Ning
+	Date:   2018-12
 
 
 1， 初始化创作者信息； tool.GenerateCreaterUser.generateBasicCreaterInfo()
@@ -42,7 +44,7 @@
 		一些测试工具：
 			测试泊松分布： tool.GenerateTimeLine.TestPosion()
 			区域单日每小时点击分布可视化： tool.GenerateTimeLine.TestUserRequestPattern()
-			区域每天点击总量分析：tool.GenerateTimeLine.TestZoneTotalRequest()
+			区域每天点击总量分析（观察每个区域每天总量是否平稳）：tool.GenerateTimeLine.TestZoneTotalRequest()
 			用户每天播放量分析：
 
 -----------------------------------------------------------------------------------
