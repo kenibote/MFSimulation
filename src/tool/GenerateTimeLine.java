@@ -333,6 +333,42 @@ public class GenerateTimeLine {
 		DataBaseTool.closeSessionFactory();
 	}
 
+	@SuppressWarnings({ "deprecation", "unchecked" })
+	@Test
+	public void TestUserMonthPattern() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+
+		int user_id = 20;
+		int[] count = new int[EndDay + 1];
+
+		Criteria criteria = session.createCriteria(Task.class);
+		criteria.add(Restrictions.eq("priority", TaskType.Request.ordinal()));
+		criteria.add(Restrictions.eq("user_id", user_id));
+
+		List<Task> tasklist = criteria.list();
+		for (Task task : tasklist) {
+			count[task.getDate().getDay()]++;
+		}
+
+		// 画图
+		TimeSeries timeseries = new TimeSeries("Request Count for User " + user_id);
+		for (int day = 1; day <= EndDay; day++) {
+			timeseries.add(new Day(day, 1, 2018), count[day]);
+		}
+		TimeSeriesCollection timeseriescollection = new TimeSeriesCollection();
+		timeseriescollection.addSeries(timeseries);
+
+		DrawPicture.DrawTimeLine(timeseriescollection, "CheckTimePattern", "Day", "Request");
+		DrawPicture.waitExit();
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
 	public static String getFormateNumber(int data, int len) {
 		int length = ("" + data).length();
 		String res = "";

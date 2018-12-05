@@ -45,7 +45,7 @@
 			测试泊松分布： tool.GenerateTimeLine.TestPosion()
 			区域单日每小时点击分布可视化： tool.GenerateTimeLine.TestZoneRequestPatternInOneDay()
 			区域每天点击总量分析（观察每个区域每天总量是否平稳）：tool.GenerateTimeLine.TestZoneTotalRequest()
-			用户每天播放量分析：
+			用户每天播放量分析：tool.GenerateTimeLine.TestUserMonthPattern()
 
 -----------------------------------------------------------------------------------
 13, 准备Redis缓存数据：
