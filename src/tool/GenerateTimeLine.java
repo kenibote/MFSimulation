@@ -419,7 +419,7 @@ public class GenerateTimeLine {
 
 		List<Task> tasklist = criteria.list();
 		for (Task task : tasklist) {
-			count[task.getDate().getDay()]++;
+			count[task.getDate().getDate()]++;
 		}
 
 		// 画图
