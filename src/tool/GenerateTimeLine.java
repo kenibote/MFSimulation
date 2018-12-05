@@ -220,10 +220,22 @@ public class GenerateTimeLine {
 		// ------------------------------------------
 
 		Jedis jedis = DataBaseTool.getJedis();
+		int start = 0;
+		int batch = 10_0000;
 
-		List<Task> taskList = session.createCriteria(Task.class).list();
-		for (Task task : taskList) {
-			jedis.zadd("A_Time_Line", task.getTime(), task.toJSONString());
+		while (start < 2040_0000) {
+			Criteria criteria = session.createCriteria(Task.class);
+			criteria.setFirstResult(start);
+			criteria.setMaxResults(batch);
+
+			List<Task> taskList = criteria.list();
+			for (Task task : taskList) {
+				jedis.zadd("A_Time_Line", task.getTime(), task.toJSONString());
+			}
+
+			session.clear();
+			start += batch;
+			System.out.print(start);
 		}
 
 		// ------------------------------------------
@@ -234,7 +246,7 @@ public class GenerateTimeLine {
 
 	@SuppressWarnings({ "deprecation", "unchecked" })
 	@Test
-	public void TestUserRequestPattern() {
+	public void TestZoneRequestPatternInOneDay() {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
 		// ------------------------------------------
@@ -306,7 +318,7 @@ public class GenerateTimeLine {
 
 		// 画图
 		TimeSeries timeseries = new TimeSeries("Request Count per Day " + zoneName);
-		for (int day = start_day; day <= EndDay; day++) {
+		for (int day = 1; day <= EndDay; day++) {
 			timeseries.add(new Day(day, 1, 2018), count[day]);
 		}
 		TimeSeriesCollection timeseriescollection = new TimeSeriesCollection();
