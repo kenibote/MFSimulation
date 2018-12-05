@@ -1,12 +1,13 @@
 package tool;
 
+import java.math.BigInteger;
 import java.util.*;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.Query;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.Hour;
@@ -272,7 +273,7 @@ public class GenerateTimeLine {
 		DataBaseTool.closeSessionFactory();
 	}
 
-	@SuppressWarnings({ "deprecation" })
+	@SuppressWarnings({ "deprecation", "rawtypes" })
 	@Test
 	public void TestZoneTotalRequest() {
 		Session session = DataBaseTool.getSession();
@@ -283,19 +284,21 @@ public class GenerateTimeLine {
 		String zoneName = "Zone_1";
 		int[] count = new int[EndDay + 1];
 
-		for (; start_day <= EndDay; start_day++) {
-			System.out.println(start_day + "......");
-			long time_start = new Date(2018 - 1900, 0, start_day, 0, 0, 0).getTime();
-			long time_end = new Date(2018 - 1900, 0, start_day + 1, 0, 0, 0).getTime();
+		for (int day = start_day; day <= EndDay; day++) {
+			System.out.print(day + "......");
+			long time_start = new Date(2018 - 1900, 0, day, 0, 0, 0).getTime();
+			long time_end = new Date(2018 - 1900, 0, day + 1, 0, 0, 0).getTime();
 
-			Criteria criteria = session.createCriteria(Task.class);
-			criteria.add(Restrictions.eq("priority", TaskType.Request.ordinal()));
-			criteria.add(Restrictions.eq("zoneName", zoneName));
-			criteria.add(Restrictions.gt("time", time_start));
-			criteria.add(Restrictions.lt("time", time_end));
+			String sql = " SELECT count(*) FROM mfsimulation.time_line_info "
+					+ "where time > :time_start and time < :time_end and zoneName = :zonename";
 
-			criteria.setProjection(Projections.rowCount());
-			count[start_day] = (int) criteria.uniqueResult();
+			Query query = session.createSQLQuery(sql);
+			query.setParameter("time_start", time_start);
+			query.setParameter("time_end", time_end);
+			query.setParameter("zonename", zoneName);
+
+			count[day] = ((BigInteger) query.uniqueResult()).intValue();
+			System.out.println(count[day]);
 
 			// 清理垃圾
 			session.clear();
