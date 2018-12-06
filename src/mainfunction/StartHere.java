@@ -38,7 +38,7 @@ public class StartHere {
 		// 按照分钟取任务
 		while (start_time < end_time) {
 			// 监测使用
-			System.out.println(start_time);
+			System.out.println("------:" + start_time);
 
 			Set<String> tasklist = redis.zrangeByScore("A_Time_Line", start_time, start_time + batch);
 			// 更新时间
@@ -75,7 +75,8 @@ public class StartHere {
 	}
 
 	public static void InitRedis() {
-		
+		System.out.println(">>>>>>正在初始化Redis......");
+
 		for (int zone = 1; zone <= GenerateCreaterUser.zoneNumber; zone++) {
 			redis.hset("A_MEC_AvailableState", "Zone_" + zone, "0");
 		}
@@ -96,7 +97,7 @@ public class StartHere {
 
 		// 1. 在全局以及每个zone中设置期望点击数的数据；
 		redis.hset("A_Content_ValueGlobal", contentName, "" + creater.getTotalSubscribeNmuber());
-		for (int zone = 1; zone <= 4; zone++) {
+		for (int zone = 1; zone <= GenerateCreaterUser.zoneNumber; zone++) {
 			redis.hset("A_Content_ValueZone_" + zone, contentName,
 					"" + creater.getZoneSubscribeNumber().get("Zone_" + zone));
 		}
@@ -106,7 +107,7 @@ public class StartHere {
 		// jedis.sadd(task.getUpload_content(), "init");
 
 		// 3. 在Redis中每个zone中添加记录，用于记录该区域有多少份copy；
-		for (int zone = 1; zone <= 4; zone++) {
+		for (int zone = 1; zone <= GenerateCreaterUser.zoneNumber; zone++) {
 			redis.hset("A_Content_CopyNumberZone_" + zone, contentName, "0");
 		}
 
@@ -122,7 +123,7 @@ public class StartHere {
 		// 5. 根据该用户是否是热门用户，决定是否推送到MEC中； 且只有在MIXCO模式中才进行推送
 		if (Workmode == WorkMode.MIXCO_EXPECT || Workmode == WorkMode.MIXCO_LRU || Workmode == WorkMode.MIXCO_NULL) {
 			if (creater.getPopular() == Popular.YES) {
-				for (int zone = 1; zone <= 4; zone++) {
+				for (int zone = 1; zone <= GenerateCreaterUser.zoneNumber; zone++) {
 					// 先清除一个位子出来
 					DeleteOneContentInMEC("A_Content_CacheMEC_" + zone, "A_Content_ValueZone_" + zone);
 					// 将内容放进去
@@ -175,7 +176,7 @@ public class StartHere {
 
 	static HashMap<String, String> MEC_Name_Map = new HashMap<>();
 	static {
-		for (int i = 1; i <= 4; i++) {
+		for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
 			MEC_Name_Map.put("Zone_" + i, "A_Content_CacheMEC_" + i);
 		}
 	}
@@ -185,6 +186,8 @@ public class StartHere {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
 		// ------------------------------------------
+		System.out.println(">>>>>>正在载入UserInfo......");
+
 		for (int u_id = 1; u_id <= GenerateCreaterUser.TotalUserNumber; u_id++) {
 			User_Info.put(u_id, session.get(User.class, u_id));
 			System.out.println("Loading User:" + u_id);
@@ -251,6 +254,9 @@ public class StartHere {
 					redis.srem("A_Content_CacheMEC_SET_" + task.getZoneName(), del);
 				}
 
+				// A_Content_CacheMEC_LRU_Zone_1~4 &
+				// A_Content_CacheMEC_SET_Zone_1~4
+				// 在此处被初始化
 				redis.rpush("A_Content_CacheMEC_LRU_" + task.getZoneName(), watchContentName);
 				redis.sadd("A_Content_CacheMEC_SET_" + task.getZoneName(), watchContentName);
 			}
@@ -296,7 +302,7 @@ public class StartHere {
 		HashSet<String> candid_set = new HashSet<>();
 
 		boolean flag = false;
-		for (int zone = 1; zone <= 4; zone++) {
+		for (int zone = 1; zone <= GenerateCreaterUser.zoneNumber; zone++) {
 			if (redis.zscore("A_Content_CacheMEC_" + zone, watchContentName) != null
 					&& Integer.parseInt(redis.hget("A_MEC_AvailableState", "Zone_" + zone)) < MEC_MAX_Capacity) {
 				// 如果该服务器有该资源并且有服务能力，则加入到候选人列表
@@ -404,8 +410,8 @@ public class StartHere {
 
 				if (Workmode == WorkMode.LRU_LRU || Workmode == WorkMode.MIXCO_LRU) {
 					// 如果工作在LRU模式,使对方的地址列表更新
-					redis.lrem(User_Info.get(target_user).getCacheAddress(), 1, watchContentName);
-					redis.rpush(User_Info.get(target_user).getCacheAddress(), watchContentName);
+					redis.lrem(User_Info.get(Integer.parseInt(target_user)).getCacheAddress(), 1, watchContentName);
+					redis.rpush(User_Info.get(Integer.parseInt(target_user)).getCacheAddress(), watchContentName);
 				}
 			}
 
@@ -424,12 +430,11 @@ public class StartHere {
 		check.setDate(task.getDate());
 		check.setTime(task.getTime());
 
-		for (int i = 1; i <= 4; i++) {
-			check.getMEC_Pressure().put("Zone_" + 1, Integer.parseInt(redis.hget("A_MEC_AvailableState", "Zone_" + i)));
+		for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
+			check.getMEC_Pressure().put("Zone_" + i, Integer.parseInt(redis.hget("A_MEC_AvailableState", "Zone_" + i)));
 		}
 
 		// TODO 今后可能需要添加数据完整性检查过程
-
 		redis.zadd("Check_Info", check.getTime(), check.toJSON());
 	}
 
@@ -437,7 +442,6 @@ public class StartHere {
 		// TODO 只有工作在MEC模式才进行整理
 		if (Workmode == WorkMode.MIXCO_EXPECT || Workmode == WorkMode.MIXCO_LRU || Workmode == WorkMode.MIXCO_NULL) {
 
-			
 		}
 	}
 

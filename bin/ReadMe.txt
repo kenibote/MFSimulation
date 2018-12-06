@@ -2,6 +2,7 @@
 	Author: Wang Ning
 	Date:   2018-12
 
+0, 检查数据库地址；
 
 1， 初始化创作者信息； tool.GenerateCreaterUser.generateBasicCreaterInfo()
 2， 为创作者设置到达率信息： tool.GenerateCreaterUser.generateCreaterArrivalRate()
@@ -65,23 +66,23 @@
 				5. 根据该用户是否是热门用户，决定是否推送到MEC中；
 		
 		Redis缓存信息：
-				A_Time_Line / Time : (sort set) 记录时间轴
-				A_MEC_AvailableState / Zone_1 : (hash) 服务器状态表
-				A_User_AvailableState / u_id : (hash) 用户状态表
-				A_Content_ValueGlobal / contentName : (hash) 全局点击数期望
-				A_Content_ValueZone_1~4 / contentName : (hash) Zone点击数期望
-				A_Content_CopyNumberZone_1~4 / contentName : (hash) zone中内容copy数目
-				WatchList_Sub_1~10000 ：(set) 
-				WatchList_Unsub_1~10000 : (set)
+		（x）	A_Time_Line / Time : (sort set) 记录时间轴
+		（I）	A_MEC_AvailableState / Zone_1 : (hash) 服务器状态表
+		（I）	A_User_AvailableState / u_id : (hash) 用户状态表
+		（D）	A_Content_ValueGlobal / contentName : (hash) 全局点击数期望
+		（D）	A_Content_ValueZone_1~4 / contentName : (hash) Zone点击数期望
+		（D）	A_Content_CopyNumberZone_1~4 / contentName : (hash) zone中内容copy数目
+		(D)		WatchList_Sub_1~10000 ：(set) 
+		(D)		WatchList_Unsub_1~10000 : (set)
 				
-				B_linshi_candidate / String (sort set)
+		（D）	B_linshi_candidate / String (sort set)
 
-				A_Content_CacheMEC_1~4 / contentName : (sort set)			
+		（D）	A_Content_CacheMEC_1~4 / contentName : (sort set)			
 
 				A_Content_CacheMEC_LRU_Zone_1~4 (list)
 				A_Content_CacheMEC_SET_Zone_1~4 (set)
 				
-				user.getCacheAddress() 在LRU和MIX下有不同的数据结构
+		（D）	user.getCacheAddress() 在LRU和MIX下有不同的数据结构
 				
 -----------------------------------------------------------------------------------
 Task的逻辑处理函数
