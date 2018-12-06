@@ -22,43 +22,43 @@ public class RedisTool {
 		redis.select(0);
 
 		// 用于存储每个内容的 global value (type = sorted set)
-		//redis.zadd("A_Content_ValueGlobal", -1, "init");
+		// redis.zadd("A_Content_ValueGlobal", -1, "init");
 
 		for (int zone = 1; zone <= GenerateCreaterUser.zoneNumber; zone++) {
 			// 用于存储每个内容在每个区域内的 value (type = sorted set)
-			//redis.zadd("A_Content_ValueZone_" + zone, -1, "init");
+			// redis.zadd("A_Content_ValueZone_" + zone, -1, "init");
 
 			// 用于记录每个MEC内存了哪些内容 (type = sorted set)
-			redis.zadd("A_Content_CacheMEC_" + zone, 100000, "init");
+			// redis.zadd("A_Content_CacheMEC_" + zone, 100000, "init");
 
 			// 用于存放每个区域内，每个内容有多少份拷贝 (type = hash map)
-			//redis.hset("A_Content_CopyNumberZone_" + zone, "init", "-1");
+			// redis.hset("A_Content_CopyNumberZone_" + zone, "init", "-1");
 		}
 
 		List<User> userList = session.createCriteria(User.class).list();
 		for (User user : userList) {
 			// 用于存储每个Fog用户的缓存内容 (type = set)
-			redis.sadd(user.getCacheAddress(), "init");
+			// redis.sadd(user.getCacheAddress(), "init");
 
 			// stopWatch
 			System.out.println(user.getUserId());
 		}
 
-		// TODO 每个区域内，每个内容在哪些Fog上有存
+		// 每个区域内，每个内容在哪些Fog上有存
 		// 这个还是放在Redis里面， 用每个内容的名字做地址。set数据类型，操作起来速度很快。
 
 		// 每个MEC 服务器的目前负载 (type = hash map)
 		for (int zone = 1; zone <= GenerateCreaterUser.zoneNumber; zone++) {
-			redis.hset("A_MEC_AvailableState", "MEC_" + zone, "0");
+			redis.hset("A_MEC_AvailableState", "Zone_" + zone, "0");
 		}
 
 		for (User user : userList) {
 			// 每个user 的目前负载 (type = hash map)
-			redis.hset("A_User_AvailableState", user.getUserName(), "0");
+			redis.hset("A_User_AvailableState", "" + user.getUserId(), "0");
 
 			// 初始化用户观看列表 (type = set)
-			//redis.sadd("WatchList_Sub_" + user.getUserName(), "init");
-			//redis.sadd("WatchList_Unsub_" + user.getUserName(), "init");
+			// redis.sadd("WatchList_Sub_" + user.getUserName(), "init");
+			// redis.sadd("WatchList_Unsub_" + user.getUserName(), "init");
 
 			// stopWatch
 			System.out.println(user.getUserId());
@@ -80,6 +80,16 @@ public class RedisTool {
 		redis.flushAll();
 
 		DataBaseTool.clossJedis();
+	}
+
+	@Test
+	public void Test() {
+		Jedis redis = DataBaseTool.getJedis();
+
+		System.out.println(redis.zrange("test", 0, 0));
+		// System.out.println(redis.zrangeByScore("test", Integer.MIN_VALUE,
+		// Integer.MAX_VALUE, 0, 1));
+		// System.out.println(redis.zrange("test", 0, -1));
 	}
 
 }

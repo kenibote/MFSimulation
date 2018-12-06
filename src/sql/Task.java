@@ -37,6 +37,11 @@ public class Task {
 	// 请求任务
 	private int user_id;
 	private String zoneName;
+	// 请求任务结果
+	@Enumerated(EnumType.STRING)
+	private TaskResult taskResult;
+	private int server_user_id;
+	private String server_MEC;
 
 	// 监测任务
 
@@ -122,7 +127,7 @@ public class Task {
 	public void setUser_id(int user_id) {
 		this.user_id = user_id;
 	}
-	
+
 	public String getZoneName() {
 		return zoneName;
 	}
@@ -131,12 +136,36 @@ public class Task {
 		this.zoneName = zoneName;
 	}
 
+	public TaskResult getTaskResult() {
+		return taskResult;
+	}
+
+	public void setTaskResult(TaskResult taskResult) {
+		this.taskResult = taskResult;
+	}
+
+	public int getServer_user_id() {
+		return server_user_id;
+	}
+
+	public void setServer_user_id(int server_user_id) {
+		this.server_user_id = server_user_id;
+	}
+
+	public String getServer_MEC() {
+		return server_MEC;
+	}
+
+	public void setServer_MEC(String server_MEC) {
+		this.server_MEC = server_MEC;
+	}
+
 	@Override
 	public String toString() {
 		return "Task [taskid=" + taskid + ", date=" + date + ", priority=" + priority + ", taskType=" + taskType + "]";
 	}
 
-	public String toJSONString(){
+	public String toJSONString() {
 		return JSON.toJSONString(this);
 	}
 }
