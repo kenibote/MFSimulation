@@ -12,14 +12,16 @@ import sql.*;
 import tool.*;
 
 public class StartHere {
-	
+
 	// 设置工作模式
 	static WorkMode Workmode = WorkMode.LRU_NULL;
 
 	static Jedis redis = DataBaseTool.getJedis();
 	static int MEC_MAX_Capacity = 100;
 	static int User_MAX_Capacity = 2;
-	static int Server_Time = 20;
+	static int Server_Time = 20; // 20s
+	static int User_Max_Cache = 25;
+	static int MEC_Max_Cache = 500;
 	static Random random = new Random();
 
 	// 仿真程序从这里开始
@@ -55,9 +57,10 @@ public class StartHere {
 					UploadTask(task);
 					break;
 				case MEC_Cache_Arrange:
+					MECArrangeTask();
 					break;
 				case Request:
-					RequestTask(task);
+					RequestTaskV2(task);
 					break;
 				case MEC_Pressure_Check:
 					CheckTask(task);
@@ -72,6 +75,7 @@ public class StartHere {
 	}
 
 	public static void InitRedis() {
+		
 		for (int zone = 1; zone <= GenerateCreaterUser.zoneNumber; zone++) {
 			redis.hset("A_MEC_AvailableState", "Zone_" + zone, "0");
 		}
@@ -115,14 +119,16 @@ public class StartHere {
 			}
 		}
 
-		// 5. 根据该用户是否是热门用户，决定是否推送到MEC中；
-		if (creater.getPopular() == Popular.YES) {
-			for (int zone = 1; zone <= 4; zone++) {
-				// 先清除一个位子出来
-				DeleteOneContentInMEC("A_Content_CacheMEC_" + zone, "A_Content_ValueZone_" + zone);
-				// 将内容放进去
-				redis.zadd("A_Content_CacheMEC_" + zone, creater.getZoneSubscribeNumber().get("Zone_" + zone),
-						contentName);
+		// 5. 根据该用户是否是热门用户，决定是否推送到MEC中； 且只有在MIXCO模式中才进行推送
+		if (Workmode == WorkMode.MIXCO_EXPECT || Workmode == WorkMode.MIXCO_LRU || Workmode == WorkMode.MIXCO_NULL) {
+			if (creater.getPopular() == Popular.YES) {
+				for (int zone = 1; zone <= 4; zone++) {
+					// 先清除一个位子出来
+					DeleteOneContentInMEC("A_Content_CacheMEC_" + zone, "A_Content_ValueZone_" + zone);
+					// 将内容放进去
+					redis.zadd("A_Content_CacheMEC_" + zone, creater.getZoneSubscribeNumber().get("Zone_" + zone),
+							contentName);
+				}
 			}
 		}
 
@@ -146,7 +152,24 @@ public class StartHere {
 		}
 	}
 
-	public static void DeleteOneContentInUser(String UserAddress) {
+	public static void DeleteOneContentInUserMix(String UserAddress) {
+		long number = redis.scard(UserAddress);
+		if (number < User_Max_Cache) {
+			return;
+		}
+
+		// TODO 目前存在4中初步想法
+		// 2. 弹出区域内缓存数目最多的内容；
+		// 3. 弹出区域内期望观看次数最低的内容；
+		// 4. 弹出 缓存数目*期望值 最低/高的内容？？？
+	}
+
+	public static void DeleteOneContentInUserLRU(String UserAddress, Task task) {
+		if (redis.llen(UserAddress) >= MEC_Max_Cache) {
+			String del = redis.lpop(UserAddress);
+			redis.srem(del, "" + task.getUser_id());
+			redis.hincrBy("A_Content_CopyNumber" + task.getZoneName(), del, -1l);
+		}
 
 	}
 
@@ -172,9 +195,9 @@ public class StartHere {
 	}
 
 	public static String RandomPickUpContent(int u_id) {
-		double ratio = random.nextDouble() * 10;
+		double ratio = random.nextDouble() * 100;
 		String content = null;
-		if (ratio < 90.0) {
+		if (ratio <= 90.0) {
 			content = redis.srandmember("WatchList_Sub_" + u_id);
 			redis.srem("WatchList_Sub_" + u_id, content);
 		} else {
@@ -186,11 +209,10 @@ public class StartHere {
 		return content;
 	}
 
-	public static void RequestTask(Task task) {
-
+	public static void RequestTaskV2(Task task) {
 		User user = User_Info.get(task.getUser_id());
 
-		// 1. TODO 先生成要观看的内容 （热门？非热门？）， 并将该内容从列表中移除
+		// 1. 先生成要观看的内容 （热门？非热门？）， 并将该内容从列表中移除
 		String watchContentName = RandomPickUpContent(user.getUserId());
 
 		// 创建资源释放任务
@@ -200,9 +222,80 @@ public class StartHere {
 
 		// 2. 查找本地MEC服务器； 查找相邻MEC服务器； 查找本zone内的用户；
 		boolean flag = false;
+
+		// 先在MEC中查找
+		if (Workmode == WorkMode.MIXCO_EXPECT || Workmode == WorkMode.MIXCO_LRU || Workmode == WorkMode.MIXCO_NULL) {
+			flag = Find_MEC_MIX_MODE(watchContentName, task, release);
+		} else {
+			flag = Find_MEC_LRU_MODE(watchContentName, task, release);
+		}
+
+		// 如果MEC不能处理
+		if (!flag) {
+			// 即允许有FOG缓存的情况
+			if (Workmode == WorkMode.LRU_LRU || Workmode == WorkMode.MIXCO_EXPECT || Workmode == WorkMode.MIXCO_LRU) {
+				flag = Find_Fog(watchContentName, task, release, user);
+			}
+		}
+
+		// 如果Fog不能处理
+		if (!flag) {
+			flag = true;
+			task.setTaskResult(TaskResult.Original);
+
+			// 如果工作在LRU模式
+			if (Workmode == WorkMode.LRU_LRU || Workmode == WorkMode.LRU_NULL) {
+				// 如果空间已满
+				if (redis.scard("A_Content_CacheMEC_SET_" + task.getZoneName()) >= MEC_Max_Cache) {
+					String del = redis.lpop("A_Content_CacheMEC_LRU_" + task.getZoneName());
+					redis.srem("A_Content_CacheMEC_SET_" + task.getZoneName(), del);
+				}
+
+				redis.rpush("A_Content_CacheMEC_LRU_" + task.getZoneName(), watchContentName);
+				redis.sadd("A_Content_CacheMEC_SET_" + task.getZoneName(), watchContentName);
+			}
+
+		}
+
+		// 3. 生成任务结果，写入Redis； 并创建资源释放任务，写入Redis；
+		release.setDate(new Date(task.getDate().getTime() + Server_Time * 1000));
+		release.setTime(release.getDate().getTime() + release.getPriority());
+		if (task.getTaskResult() != TaskResult.Original) {
+			redis.zadd("A_Time_Line", release.getTime(), release.toJSONString());
+		}
+		redis.zadd("A_Time_Line_Result", task.getTime(), task.toJSONString());
+
+		// 4. 更新本地缓存内容列表，以及相关记录数据；
+		if (user.getCacheEnable() == CacheEnable.YES) {
+			if (Workmode == WorkMode.MIXCO_EXPECT) {
+				// 先清除一个空位
+				DeleteOneContentInUserMix(user.getCacheAddress());
+				// 缓存该内容
+				redis.sadd(user.getCacheAddress(), watchContentName);
+			}
+
+			if (Workmode == WorkMode.LRU_LRU || Workmode == WorkMode.MIXCO_LRU) {
+				// LRU模式
+				DeleteOneContentInUserLRU(user.getCacheAddress(), task);
+				// 缓存该内容
+				redis.rpush(user.getCacheAddress(), watchContentName);
+			}
+
+			// 记录该内容有哪些用户缓存
+			redis.sadd(watchContentName, "" + task.getUser_id());
+			redis.hincrBy("A_Content_CopyNumber" + task.getZoneName(), watchContentName, 1l);
+		}
+
+		// 5. 更新本地以及全局，缓存中的期待观看数据；
+		redis.hincrBy("A_Content_ValueGlobal", watchContentName, -1l);
+		redis.hincrBy("A_Content_Value" + task.getZoneName(), watchContentName, -1l);
+	}
+
+	public static boolean Find_MEC_MIX_MODE(String watchContentName, Task task, Task release) {
 		redis.del("B_linshi_candidate");
 		HashSet<String> candid_set = new HashSet<>();
 
+		boolean flag = false;
 		for (int zone = 1; zone <= 4; zone++) {
 			if (redis.zscore("A_Content_CacheMEC_" + zone, watchContentName) != null
 					&& Integer.parseInt(redis.hget("A_MEC_AvailableState", "Zone_" + zone)) < MEC_MAX_Capacity) {
@@ -243,12 +336,45 @@ public class StartHere {
 			release.setSource_id(target_server);
 		}
 
+		return flag;
+	}
+
+	public static boolean Find_MEC_LRU_MODE(String watchContentName, Task task, Task release) {
+		boolean flag = false;
+
+		if (redis.sismember("A_Content_CacheMEC_SET_" + task.getZoneName(), watchContentName)
+				&& Integer.parseInt(redis.hget("A_MEC_AvailableState", task.getZoneName())) < MEC_MAX_Capacity) {
+			// 如果可以由本服务器服务
+			flag = true;
+
+			// 更新LRU顺序
+			redis.lrem("A_Content_CacheMEC_LRU_" + task.getZoneName(), 1, watchContentName);
+			redis.rpush("A_Content_CacheMEC_LRU_" + task.getZoneName(), watchContentName);
+
+			// 记录任务结果
+			task.setTaskResult(TaskResult.Self_MEC);
+			String target_server = task.getZoneName();
+
+			task.setServer_MEC(target_server);
+
+			// 更新服务器负载 +1
+			redis.hincrBy("A_MEC_AvailableState", target_server, 1l);
+			// 更新资源释放任务信息
+			release.setSource_address("A_MEC_AvailableState");
+			release.setSource_id(target_server);
+		}
+
+		return flag;
+	}
+
+	public static boolean Find_Fog(String watchContentName, Task task, Task release, User user) {
+		redis.del("B_linshi_candidate");
+		HashSet<String> candid_set = new HashSet<>();
+		boolean flag = false;
+
 		// 尝试在本zone内查找资源
 		int cache_number = Integer.parseInt(redis.hget("A_Content_CopyNumber" + task.getZoneName(), watchContentName));
-		if (!flag && cache_number > 0) {
-			candid_set.clear();
-			redis.del("B_linshi_candidate");
-
+		if (cache_number > 0) {
 			Set<String> user_id_list = redis.smembers(watchContentName);
 			for (String inuser_id : user_id_list) {
 				User inner_user = User_Info.get(Integer.parseInt(inuser_id));
@@ -275,40 +401,17 @@ public class StartHere {
 				// 更新资源释放任务信息
 				release.setSource_address("A_User_AvailableState");
 				release.setSource_id(target_user);
+
+				if (Workmode == WorkMode.LRU_LRU || Workmode == WorkMode.MIXCO_LRU) {
+					// 如果工作在LRU模式,使对方的地址列表更新
+					redis.lrem(User_Info.get(target_user).getCacheAddress(), 1, watchContentName);
+					redis.rpush(User_Info.get(target_user).getCacheAddress(), watchContentName);
+				}
 			}
 
 		}
 
-		// 由原服务器处理
-		if (!flag) {
-			flag = true;
-			task.setTaskResult(TaskResult.Original);
-		}
-
-		// 3. 生成任务结果，写入Redis； 并创建资源释放任务，写入Redis；
-		release.setDate(new Date(task.getDate().getTime() + Server_Time * 1000));
-		release.setTime(release.getDate().getTime() + release.getPriority());
-		if (task.getTaskResult() != TaskResult.Original) {
-			redis.zadd("A_Time_Line", release.getTime(), release.toJSONString());
-		}
-		redis.zadd("A_Time_Line_Result", task.getTime(), task.toJSONString());
-
-		// 4. 更新本地缓存内容列表，以及相关记录数据；
-		if (user.getCacheEnable() == CacheEnable.YES) {
-			// 先清除一个空位
-			DeleteOneContentInUser(user.getCacheAddress());
-			// 缓存该内容
-			redis.sadd(user.getCacheAddress(), watchContentName);
-			// 记录该内容有哪些用户缓存
-			redis.sadd(watchContentName, "" + task.getUser_id());
-			redis.hincrBy("A_Content_CopyNumber" + task.getZoneName(), watchContentName, 1l);
-		}
-
-		// 5. 更新本地以及全局，缓存中的期待观看数据；
-		redis.hincrBy("A_Content_ValueGlobal", watchContentName, -1l);
-		redis.hincrBy("A_Content_Value" + task.getZoneName(), watchContentName, -1l);
-		// 如果本地缓存了该内容，更新其值. 思考，这个地方是否应该在需要删除的时候统一更新？
-		// mainfunction.StartHere.DeleteOneContentInMEC(String)
+		return flag;
 	}
 
 	public static void ReleaseTask(Task task) {
@@ -328,6 +431,14 @@ public class StartHere {
 		// TODO 今后可能需要添加数据完整性检查过程
 
 		redis.zadd("Check_Info", check.getTime(), check.toJSON());
+	}
+
+	public static void MECArrangeTask() {
+		// TODO 只有工作在MEC模式才进行整理
+		if (Workmode == WorkMode.MIXCO_EXPECT || Workmode == WorkMode.MIXCO_LRU || Workmode == WorkMode.MIXCO_NULL) {
+
+			
+		}
 	}
 
 }

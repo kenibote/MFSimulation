@@ -63,8 +63,26 @@
 				3. 在Redis中每个zone中添加记录，用于记录该区域有多少份copy； 
 				4. 将该内容推送给用户的观看列表； 
 				5. 根据该用户是否是热门用户，决定是否推送到MEC中；
-			
+		
+		Redis缓存信息：
+				A_Time_Line / Time : (sort set) 记录时间轴
+				A_MEC_AvailableState / Zone_1 : (hash) 服务器状态表
+				A_User_AvailableState / u_id : (hash) 用户状态表
+				A_Content_ValueGlobal / contentName : (hash) 全局点击数期望
+				A_Content_ValueZone_1~4 / contentName : (hash) Zone点击数期望
+				A_Content_CopyNumberZone_1~4 / contentName : (hash) zone中内容copy数目
+				WatchList_Sub_1~10000 ：(set) 
+				WatchList_Unsub_1~10000 : (set)
+				
+				B_linshi_candidate / String (sort set)
 
+				A_Content_CacheMEC_1~4 / contentName : (sort set)			
+
+				A_Content_CacheMEC_LRU_Zone_1~4 (list)
+				A_Content_CacheMEC_SET_Zone_1~4 (set)
+				
+				user.getCacheAddress() 在LRU和MIX下有不同的数据结构
+				
 -----------------------------------------------------------------------------------
 Task的逻辑处理函数
 
