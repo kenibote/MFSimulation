@@ -67,32 +67,35 @@
 		
 		Redis缓存信息：
 		（x）	A_Time_Line / Time : (sort set) 记录时间轴
+		（D）	A_Time_Line_Result
 		（I）	A_MEC_AvailableState / Zone_1 : (hash) 服务器状态表
 		（I）	A_User_AvailableState / u_id : (hash) 用户状态表
-		（D）	A_Content_ValueGlobal / contentName : (hash) 全局点击数期望
-		（D）	A_Content_ValueZone_1~4 / contentName : (hash) Zone点击数期望
+		（D）	A_Content_ValueGlobal / contentName : (sort set) 全局点击数期望
+		（D）	A_Content_ValueZone_1~4 / contentName : (sort set) Zone点击数期望
 		（D）	A_Content_CopyNumberZone_1~4 / contentName : (hash) zone中内容copy数目
-		(D)		WatchList_Sub_1~10000 ：(set) 
-		(D)		WatchList_Unsub_1~10000 : (set)
+		（D）	WatchList_Sub_1~10000 ：(set) 
+		（D）	WatchList_Unsub_1~10000 : (set)
 				
 		（D）	B_linshi_candidate / String (sort set)
-
+		（D）	B_linshi_del / String (sort set)
+				
 		（D）	A_Content_CacheMEC_1~4 / contentName : (sort set)			
 
 				A_Content_CacheMEC_LRU_Zone_1~4 (list)
 				A_Content_CacheMEC_SET_Zone_1~4 (set)
 				
-		（D）	user.getCacheAddress() 在LRU和MIX下有不同的数据结构
+		（D）	user.getCacheAddress() 在LRU和别的模式下有不同的数据结构
 				
 -----------------------------------------------------------------------------------
 Task的逻辑处理函数
 
 	一些工具：
-		随机选择函数：
+		随机选择函数：mainfunction.StartHere.RandomPickUpContent(int)
 		
 	数据分析工具：
 		仿真进行过程中的数据完整性检查工具：
-		负载分析：
+		负载分析：mainfunction.Analysis.analysisPressure()
 		QoS分析：
+		命中率统计分析：mainfunction.Analysis.analysisHit()
 
 	
