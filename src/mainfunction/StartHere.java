@@ -213,6 +213,7 @@ public class StartHere {
 			del_con = s;
 		}
 
+		redis.srem(UserAddress, del_con);
 		redis.srem(del_con, "" + task.getUser_id());
 		redis.hincrBy("A_Content_CopyNumber" + task.getZoneName(), del_con, -1l);
 	}
@@ -284,7 +285,7 @@ public class StartHere {
 		if (mecmode == MECMode.LRU) {
 			flag = Find_MEC_LRU_MODE(watchContentName, task, release);
 		} else {
-			flag = Find_MEC_MIX_MODE(watchContentName, task, release);
+			flag = Find_MEC_MODE(watchContentName, task, release);
 		}
 
 		// 如果MEC不能处理
@@ -353,7 +354,7 @@ public class StartHere {
 		redis.zincrby("A_Content_Value" + task.getZoneName(), -1, watchContentName);
 	}
 
-	public static boolean Find_MEC_MIX_MODE(String watchContentName, Task task, Task release) {
+	public static boolean Find_MEC_MODE(String watchContentName, Task task, Task release) {
 		redis.del("B_linshi_candidate");
 		HashSet<String> candid_set = new HashSet<>();
 
