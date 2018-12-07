@@ -1,49 +1,28 @@
 package demo;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.util.*;
 
-@Entity
-@Table(name="test_speed")
+import org.junit.Test;
+
 public class TestSpeed {
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Long id;
+	HashMap<String, HashSet<String>> WatchList = new HashMap<>();
 	
-	private String Name;
-	
-	private String Content;
-	
-	public TestSpeed() {
+	@Test
+	public void testWatchList(){
+		for(int  i=1;i<=10000;i++){
+			WatchList.put(""+i, new HashSet<>());
+		}
+		
+		for(int i=1;i<=10000;i++){
+			for(int j=1;j<=3000;j++){
+				WatchList.get(""+i).add("Content_1000_29_002_"+j);
+			}
+			
+			System.out.println(i);
+		}
+		
+		System.out.println("Done");
 	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return Name;
-	}
-
-	public void setName(String name) {
-		Name = name;
-	}
-
-	public String getContent() {
-		return Content;
-	}
-
-	public void setContent(String content) {
-		Content = content;
-	}
-	
 	
 }

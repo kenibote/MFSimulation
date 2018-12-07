@@ -89,15 +89,27 @@ public class StartHere {
 		}
 	}
 
-	public static void UploadTask(Task task) {
+	// 存在JAVA缓存中，加速读取
+	static HashMap<Integer, Creater> Creater_Info = new HashMap<>();
+	static {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
+
+		for (int id = 1; id <= GenerateCreaterUser.TotalCreaterNumber; id++) {
+			Creater_Info.put(id, session.get(Creater.class, id));
+		}
+
 		// ------------------------------------------
-		// 内存中会读取所有creater的信息
-		Creater creater = session.get(Creater.class, task.getUpload_id());
+		tx.commit();
+		session.close();
+	}
+
+	public static void UploadTask(Task task) {
+
+		Creater creater = Creater_Info.get(task.getUpload_id());
 		String contentName = task.getUpload_content();
 
-		// 1. 在全局以及每个zone中设置期望点击数的数据；
+		// 1. 在全局以及每个zone中设置期望点击数的数据； TODO 性能思考
 		redis.zadd("A_Content_ValueGlobal", creater.getTotalSubscribeNmuber(), contentName);
 		for (int zone = 1; zone <= GenerateCreaterUser.zoneNumber; zone++) {
 			redis.zadd("A_Content_ValueZone_" + zone, creater.getZoneSubscribeNumber().get("Zone_" + zone),
@@ -135,10 +147,6 @@ public class StartHere {
 			}
 		}
 
-		// ------------------------------------------
-		tx.commit();
-		session.close();
-		// DataBaseTool.closeSessionFactory();
 	}
 
 	public static void DeleteOneContentInMEC(String MEC_Name, String zongValueAddress) {
