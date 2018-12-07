@@ -14,7 +14,7 @@ import tool.*;
 public class StartHere {
 
 	// 设置工作模式
-	static MECMode mecmode = MECMode.MIXCO;
+	static MECMode mecmode = MECMode.DIS;
 	static FOGMode fogmode = FOGMode.EXP;
 	static DelMode Delmode = DelMode.MinExp;
 

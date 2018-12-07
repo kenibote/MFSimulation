@@ -316,6 +316,31 @@ public class GenerateTimeLine {
 
 	@SuppressWarnings({ "deprecation", "unchecked" })
 	@Test
+	public void transferUploadTasktoRedis() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+
+		Jedis jedis = DataBaseTool.getJedis();
+
+		Criteria criteria = session.createCriteria(Task.class);
+		criteria.add(Restrictions.eq("priority", TaskType.Upload.ordinal()));
+
+		List<Task> taskList = criteria.list();
+		for (Task task : taskList) {
+			jedis.zadd("A_Time_Line", task.getTime(), task.toJSONString());
+		}
+
+		session.clear();
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@SuppressWarnings({ "deprecation", "unchecked" })
+	@Test
 	public void TestZoneRequestPatternInOneDay() {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
