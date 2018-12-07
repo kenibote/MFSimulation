@@ -42,7 +42,7 @@ public class StartHere {
 
 		long start_time = new Date(2018 - 1900, 0, 1, 0, 0, 0).getTime();
 		long end_time = new Date(2018 - 1900, 0, 31, 23, 59, 59).getTime();
-		long batch = 15 * 1000; // 15s
+		long batch = 60 * 60 * 1000; // 1 hour
 
 		// 初始化Redis部分空间
 		InitRedis();
@@ -67,7 +67,7 @@ public class StartHere {
 
 				switch (task.getTaskType()) {
 				case Source_Release:
-					ReleaseTask(task);
+					// ReleaseTask(task);
 					break;
 				case Upload:
 					UploadTask(task);
@@ -439,9 +439,9 @@ public class StartHere {
 	}
 
 	public static boolean Find_Fog(String watchContentName, Task task, Task release, User user) {
-		redis.del("B_linshi_candidate");
-		HashSet<String> candid_set = new HashSet<>();
+
 		boolean flag = false;
+		String target_user = "";
 
 		// 尝试在本zone内查找资源
 		int cache_number = Integer.parseInt(redis.hget("A_Content_CopyNumber" + task.getZoneName(), watchContentName));
@@ -451,18 +451,13 @@ public class StartHere {
 				User inner_user = User_Info.get(Integer.parseInt(inuser_id));
 				int user_state = Integer.parseInt(redis.hget("A_User_AvailableState", inuser_id));
 				if (inner_user.getBelongZoneName().equals(user.getBelongZoneName()) && user_state < User_MAX_Capacity) {
-					redis.zadd("B_linshi_candidate", user_state, inuser_id);
-					candid_set.add(inuser_id);
+					flag = true;
+					target_user = inuser_id;
+					break;
 				}
 			}
 
-			if (!candid_set.isEmpty()) {
-				flag = true;
-
-				String target_user = "";
-				for (String s : redis.zrange("B_linshi_candidate", 0, 0)) {
-					target_user = s;
-				}
+			if (flag) {
 
 				task.setTaskResult(TaskResult.Self_Zone_Users);
 				task.setServer_user_id(Integer.parseInt(target_user));
