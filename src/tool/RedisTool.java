@@ -83,13 +83,34 @@ public class RedisTool {
 	}
 
 	@Test
-	public void Test() {
+	public void deeleteSomethingBeforeRunCode() {
 		Jedis redis = DataBaseTool.getJedis();
 
-		System.out.println(redis.zrange("test", 0, 0));
-		// System.out.println(redis.zrangeByScore("test", Integer.MIN_VALUE,
-		// Integer.MAX_VALUE, 0, 1));
-		// System.out.println(redis.zrange("test", 0, -1));
+		redis.del("A_ContentName");
+		redis.del("A_Content_ValueGlobal");
+		redis.del("B_linshi_candidate");
+		redis.del("B_linshi_del");
+		redis.del("A_MEC_AvailableState");
+		redis.del("A_User_AvailableState");
+
+		for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
+			redis.del("A_Content_ValueZone_" + i);
+			redis.del("A_Content_CopyNumberZone_" + i);
+			redis.del("A_Content_CacheMEC_" + i);
+			redis.del("A_Content_CacheMEC_LRU_Zone_" + i);
+			redis.del("A_Content_CacheMEC_SET_Zone_1" + i);
+		}
+
+		Set<String> keys = redis.keys("ContentCache*");
+		for (String s : keys) {
+			redis.del(s);
+		}
+
+		keys = redis.keys("C_2018_01_*");
+		for (String s : keys) {
+			redis.del(s);
+		}
+
 	}
 
 }
