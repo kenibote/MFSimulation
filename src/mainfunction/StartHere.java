@@ -40,7 +40,7 @@ public class StartHere {
 
 		long start_time = new Date(2018 - 1900, 0, 1, 0, 0, 0).getTime();
 		long end_time = new Date(2018 - 1900, 0, 31, 23, 59, 59).getTime();
-		long batch = 60 * 1000; // 60s
+		long batch = 15 * 1000; // 15s
 
 		// 初始化Redis部分空间
 		InitRedis();
