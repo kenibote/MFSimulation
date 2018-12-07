@@ -34,6 +34,8 @@ public class StartHere {
 		}
 	}
 
+	static Queue<Task> ReleaseTask = new LinkedList<>();
+
 	// 仿真程序从这里开始
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
@@ -58,6 +60,10 @@ public class StartHere {
 				// 监测使用
 				System.out.println(s);
 				Task task = JSON.parseObject(s, Task.class);
+
+				while ((!ReleaseTask.isEmpty()) && ReleaseTask.peek().getTime() < task.getTime()) {
+					ReleaseTask(ReleaseTask.poll());
+				}
 
 				switch (task.getTaskType()) {
 				case Source_Release:
@@ -322,7 +328,9 @@ public class StartHere {
 		release.setDate(new Date(task.getDate().getTime() + Server_Time * 1000));
 		release.setTime(release.getDate().getTime() + release.getPriority());
 		if (task.getTaskResult() != TaskResult.Original) {
-			redis.zadd("A_Time_Line", release.getTime(), release.toJSONString());
+			ReleaseTask.offer(release);
+			// redis.zadd("A_Time_Line", release.getTime(),
+			// release.toJSONString());
 		}
 		redis.zadd("A_Time_Line_Result", task.getTime(), task.toJSONString());
 
