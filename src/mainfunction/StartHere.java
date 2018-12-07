@@ -139,6 +139,7 @@ public class StartHere {
 		for (int u_id : creater.getSubscribers()) {
 			WatchListSub.get(u_id).add(contentName);
 		}
+		redis.sadd("A_ContentName", contentName);
 
 		// 5. 根据该用户是否是热门用户，决定是否推送到MEC中； 且只有在MIXCO模式中才进行推送
 		if (mecmode == MECMode.MIXCO) {
@@ -250,14 +251,16 @@ public class StartHere {
 
 	public static String RandomPickUpContent(int u_id) {
 		double ratio = random.nextDouble() * 100;
+		Set<String> watch = WatchListSub.get(u_id);
 		String content = null;
-		if (ratio <= 90.0) {
-			content = redis.srandmember("WatchList_Sub_" + u_id);
-			redis.srem("WatchList_Sub_" + u_id, content);
+
+		if (ratio <= 90.0 && watch.size() > 1) {
+			content = (String) watch.toArray()[random.nextInt(watch.size())];
+			watch.remove(content);
 		} else {
 			// TODO 今后可能需要增加时间限制
-			content = redis.srandmember("WatchList_Unsub_" + u_id);
-			redis.srem("WatchList_Unsub_" + u_id, content);
+			// TODO 性能原因，随机从总的内容库中选一个
+			content = redis.srandmember("A_ContentName");
 		}
 
 		return content;
