@@ -95,6 +95,8 @@ public class StartHere {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
 
+		System.out.println("Loading Creater Info...");
+		
 		for (int id = 1; id <= GenerateCreaterUser.TotalCreaterNumber; id++) {
 			Creater_Info.put(id, session.get(Creater.class, id));
 		}

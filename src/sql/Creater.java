@@ -26,14 +26,14 @@ public class Creater {
 	@Enumerated(EnumType.STRING)
 	private Popular popular;
 
-	@ElementCollection(targetClass = Integer.class)
+	@ElementCollection(targetClass = Integer.class, fetch = FetchType.EAGER)
 	@CollectionTable(name = "creater_zoneNumber_info", joinColumns = @JoinColumn(name = "createrId", nullable = false))
 	@MapKeyColumn(name = "zoneName")
 	@MapKeyClass(String.class)
 	@Column(name = "subscribeNumber", nullable = false)
 	private Map<String, Integer> zoneSubscribeNumber = new HashMap<>();
 
-	@ElementCollection(targetClass = Integer.class)
+	@ElementCollection(targetClass = Integer.class, fetch = FetchType.EAGER)
 	@CollectionTable(name = "creater_subscriber_info", joinColumns = @JoinColumn(name = "createrId", nullable = false))
 	@Column(name = "subscriberId", nullable = false)
 	private Set<Integer> subscribers = new HashSet<>();

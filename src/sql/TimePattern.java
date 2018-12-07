@@ -15,7 +15,7 @@ public class TimePattern {
 
 	private String TimePatternName;
 
-	@ElementCollection(targetClass = Double.class)
+	@ElementCollection(targetClass = Double.class, fetch=FetchType.EAGER)
 	@CollectionTable(name = "time_pattern_probability", joinColumns = @JoinColumn(name = "TimePatternId", nullable = false))
 	@MapKeyColumn(name = "time_slot")
 	@MapKeyClass(Integer.class)
