@@ -14,7 +14,7 @@ import tool.*;
 public class StartHere {
 
 	// 设置工作模式
-	static MECMode mecmode = MECMode.DIS;
+	static MECMode mecmode = MECMode.TOP;
 	static FOGMode fogmode = FOGMode.EXP;
 	static DelMode Delmode = DelMode.MinExp;
 
@@ -25,6 +25,14 @@ public class StartHere {
 	static int User_Max_Cache = 25;
 	static int MEC_Max_Cache = 500;
 	static Random random = new Random();
+
+	static HashMap<Integer, HashSet<String>> WatchListSub = new HashMap<>();
+	static {
+		System.out.println("Init WatchListSub......");
+		for (int id = 1; id <= GenerateCreaterUser.TotalUserNumber; id++) {
+			WatchListSub.put(id, new HashSet<>());
+		}
+	}
 
 	// 仿真程序从这里开始
 	@SuppressWarnings("deprecation")
@@ -96,7 +104,7 @@ public class StartHere {
 		Transaction tx = session.beginTransaction();
 
 		System.out.println("Loading Creater Info...");
-		
+
 		for (int id = 1; id <= GenerateCreaterUser.TotalCreaterNumber; id++) {
 			Creater_Info.put(id, session.get(Creater.class, id));
 		}
@@ -128,12 +136,8 @@ public class StartHere {
 		}
 
 		// 4. 将该内容推送给用户的观看列表；
-		for (int u_id = 1; u_id <= GenerateCreaterUser.TotalUserNumber; u_id++) {
-			if (creater.getSubscribers().contains(u_id)) {
-				redis.sadd("WatchList_Sub_" + u_id, contentName);
-			} else {
-				redis.sadd("WatchList_Unsub_" + u_id, contentName);
-			}
+		for (int u_id : creater.getSubscribers()) {
+			WatchListSub.get(u_id).add(contentName);
 		}
 
 		// 5. 根据该用户是否是热门用户，决定是否推送到MEC中； 且只有在MIXCO模式中才进行推送

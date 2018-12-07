@@ -73,8 +73,8 @@
 		（D）	A_Content_ValueGlobal / contentName : (sort set) 全局点击数期望
 		（D）	A_Content_ValueZone_1~4 / contentName : (sort set) Zone点击数期望
 		（D）	A_Content_CopyNumberZone_1~4 / contentName : (hash) zone中内容copy数目
-		（D）	WatchList_Sub_1~10000 ：(set) 
-		（D）	WatchList_Unsub_1~10000 : (set)
+		（N）	WatchList_Sub_1~10000 ：(set) 
+		（.）	WatchList_Unsub_1~10000 : (set)
 				
 		（D）	B_linshi_candidate / String (sort set)
 		（D）	B_linshi_del / String (sort set)
