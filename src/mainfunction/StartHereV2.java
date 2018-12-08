@@ -369,6 +369,7 @@ public class StartHereV2 {
 		}
 
 		if (mecmode == MECMode.TOP) {
+			// TODO 这里可能需要性能优化
 			for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
 				Collections.sort(ContentAll, Content.zoneComparetor.get("Zone_" + i));
 				MEC mec = MEC_Info.get("Zone_" + i);

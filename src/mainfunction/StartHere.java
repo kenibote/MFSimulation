@@ -125,7 +125,7 @@ public class StartHere {
 		Creater creater = Creater_Info.get(task.getUpload_id());
 		String contentName = task.getUpload_content();
 
-		// 1. 在全局以及每个zone中设置期望点击数的数据； TODO 性能思考
+		// 1. 在全局以及每个zone中设置期望点击数的数据； 
 		redis.zadd("A_Content_ValueGlobal", creater.getTotalSubscribeNmuber(), contentName);
 		for (int zone = 1; zone <= GenerateCreaterUser.zoneNumber; zone++) {
 			redis.zadd("A_Content_ValueZone_" + zone, creater.getZoneSubscribeNumber().get("Zone_" + zone),
@@ -265,8 +265,6 @@ public class StartHere {
 			content = (String) watch.toArray()[random.nextInt(watch.size())];
 			watch.remove(content);
 		} else {
-			// TODO 今后可能需要增加时间限制
-			// TODO 性能原因，随机从总的内容库中选一个
 			content = redis.srandmember("A_ContentName");
 		}
 
@@ -494,7 +492,6 @@ public class StartHere {
 			check.getMEC_Pressure().put("Zone_" + i, Integer.parseInt(redis.hget("A_MEC_AvailableState", "Zone_" + i)));
 		}
 
-		// TODO 今后可能需要添加数据完整性检查过程
 		redis.zadd("Check_Info", check.getTime(), check.toJSON());
 	}
 

@@ -42,6 +42,7 @@
 	5）资源释放任务会在程序仿真中动态创建
 	
 	6）将数据转移到Redis: tool.GenerateTimeLine.transferTasktoRedis()
+						tool.GenerateTimeLine.transferUploadTasktoRedis()
 	
 		一些测试工具：
 			测试泊松分布： tool.GenerateTimeLine.TestPosion()
@@ -51,8 +52,7 @@
 
 -----------------------------------------------------------------------------------
 13, 准备Redis缓存数据：
-		tool.RedisTool.initRedis()
-		tool.RedisTool.deeleteSomethingBeforeRunCode()
+		
 
 -----------------------------------------------------------------------------------
 14, 主函数： 
