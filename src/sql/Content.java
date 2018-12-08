@@ -17,6 +17,8 @@ public class Content {
 		for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
 			zoneComparetor.put("Zone_" + i, new ContentCompareterZone("Zone_" + i));
 		}
+
+		zoneComparetor.put("Global", new ContentCompareterZone("Global"));
 	}
 
 	public Content() {
@@ -41,6 +43,23 @@ public class Content {
 		ValueZone.put(zone, val);
 	}
 
+	public ArrayList<String> getMaxOrderValueZone() {
+		ArrayList<String> result = new ArrayList<>();
+		TreeMap<Double, String> rank = new TreeMap<>(Collections.reverseOrder());
+
+		double delta = 0.02;
+		for (String s : ValueZone.keySet()) {
+			rank.put(ValueZone.get(s) + delta, s);
+			delta = delta + 0.02;
+		}
+
+		for (double d : rank.keySet()) {
+			result.add(rank.get(d));
+		}
+
+		return result;
+	}
+
 	static class ContentCompareterZone implements Comparator<Content> {
 
 		String zone;
@@ -51,6 +70,9 @@ public class Content {
 
 		@Override
 		public int compare(Content o1, Content o2) {
+			if ("Global".equals(zone)) {
+				return -o1.ValueGlobal + o2.ValueGlobal;
+			}
 			return o1.ValueZone.get(zone) - o2.ValueZone.get(zone);
 		}
 

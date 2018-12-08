@@ -18,12 +18,14 @@ public class StartHereV2 {
 	static FOGMode fogmode = FOGMode.EXP;
 	public static DelMode Delmode = DelMode.MinExp;
 
-	static Jedis redis = DataBaseTool.getJedis();
 	public static int MEC_MAX_Capacity = 100;
 	public static int User_MAX_Capacity = 2;
 	static int Server_Time = 20; // 20s
 	public static int User_Max_Cache = 25;
 	public static int MEC_Max_Cache = 500;
+	static double Ratio = 90.0;
+
+	static Jedis redis = DataBaseTool.getJedis();
 	static Random random = new Random();
 
 	// 存在JAVA缓存中，加速读取
@@ -148,7 +150,7 @@ public class StartHereV2 {
 		double ratio = random.nextDouble() * 100;
 		Content content = null;
 
-		if (ratio <= 90.0 && watchlist.size() > 1) {
+		if (ratio <= Ratio && watchlist.size() > 1) {
 			content = (Content) watchlist.toArray()[random.nextInt(watchlist.size())];
 			watchlist.remove(content);
 		} else {
@@ -383,8 +385,26 @@ public class StartHereV2 {
 		}
 
 		if (mecmode == MECMode.DIS) {
+			// 先清空
+			for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
+				MEC_Info.get("Zone_" + i).CacheSet.clear();
+			}
 
-		}
+			// 排序
+			Collections.sort(ContentAll, Content.zoneComparetor.get("Global"));
+
+			for (int point = 0; point < GenerateCreaterUser.zoneNumber * MEC_Max_Cache; point++) {
+				Content c = ContentAll.get(point);
+				ArrayList<String> order = c.getMaxOrderValueZone();
+				for (String zone : order) {
+					if (MEC_Info.get(zone).CacheSet.size() < MEC_Max_Cache) {
+						MEC_Info.get(zone).addOneContent(c);
+						break;
+					}
+				}
+			} // end for
+
+		} // end DIS
 	}
 
 }
