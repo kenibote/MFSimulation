@@ -1,8 +1,12 @@
 package sql;
 
+import java.util.*;
 import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
+
+import mainfunction.DelMode;
+import mainfunction.StartHereV2;
 
 @Entity
 @Table(name = "user_info")
@@ -29,6 +33,115 @@ public class User {
 	private Integer TimePatternId;
 
 	private Double watchDayProbability;
+
+	@Transient
+	public HashSet<Content> WatchListSub = new HashSet<>();
+
+	@Transient
+	public int UserAvailableState = 0;
+
+	@Transient
+	public LinkedList<Content> CacheLRU = new LinkedList<>();
+
+	@Transient
+	public HashSet<Content> CacheSet = new HashSet<>();
+
+	public boolean isAvailable() {
+		if (UserAvailableState < StartHereV2.User_MAX_Capacity) {
+			return true;
+		}
+		return false;
+	}
+
+	private void deleteOneCache() {
+		Content del_content = null;
+		TreeMap<Integer, HashSet<Content>> linshi = new TreeMap<>();
+
+		if (StartHereV2.Delmode == DelMode.MaxCopy) {
+			for (Content c : CacheSet) {
+				int copy = c.ContentCopy.get(belongZoneName).size();
+				if (!linshi.containsKey(copy)) {
+					linshi.put(copy, new HashSet<>());
+				}
+				linshi.get(copy).add(c);
+			}
+
+			// 以后还要在多判断
+			for (Content c : linshi.lastEntry().getValue()) {
+				del_content = c;
+			}
+		}
+
+		if (StartHereV2.Delmode == DelMode.MinExp) {
+			for (Content c : CacheSet) {
+				int value = c.ValueZone.get(belongZoneName);
+				if (!linshi.containsKey(value)) {
+					linshi.put(value, new HashSet<>());
+				}
+				linshi.get(value).add(c);
+			}
+
+			// 以后还要在多判断
+			for (Content c : linshi.firstEntry().getValue()) {
+				del_content = c;
+			}
+		}
+
+		if (StartHereV2.Delmode == DelMode.MixMuilti) {
+			for (Content c : CacheSet) {
+				int value = c.ValueZone.get(belongZoneName);
+				int copy = c.ContentCopy.get(belongZoneName).size();
+				int mult = value * copy;
+
+				if (!linshi.containsKey(mult)) {
+					linshi.put(mult, new HashSet<>());
+				}
+				linshi.get(mult).add(c);
+			}
+
+			// 以后还要在多判断
+			for (Content c : linshi.firstEntry().getValue()) {
+				del_content = c;
+			}
+		}
+
+		CacheSet.remove(del_content);
+		// 向Content中删除信息
+		del_content.ContentCopy.get(belongZoneName).remove(this);
+	}
+
+	public void addOneContent(Content content) {
+		if (CacheSet.size() >= StartHereV2.User_Max_Cache) {
+			deleteOneCache();
+		}
+
+		CacheSet.add(content);
+		// 向Content中注册信息
+		content.ContentCopy.get(belongZoneName).add(this);
+	}
+
+	private void deleteOneCacheLRU() {
+		Content content = CacheLRU.pollLast();
+		CacheSet.remove(content);
+		// 向Content中删除信息
+		content.ContentCopy.get(belongZoneName).remove(this);
+	}
+
+	public void addOneContentLRU(Content content) {
+		if (CacheSet.size() >= StartHereV2.User_Max_Cache) {
+			deleteOneCacheLRU();
+		}
+
+		CacheSet.add(content);
+		CacheLRU.offerFirst(content);
+		// 向Content中注册信息
+		content.ContentCopy.get(belongZoneName).add(this);
+	}
+
+	public void updataLRUorder(Content content) {
+		CacheLRU.remove(content);
+		CacheLRU.offerFirst(content);
+	}
 
 	public User() {
 	}

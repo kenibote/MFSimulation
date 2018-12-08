@@ -86,6 +86,24 @@
 				A_Content_CacheMEC_SET_Zone_1~4 (set)
 				
 		（D）	user.getCacheAddress() 在LRU和别的模式下有不同的数据结构
+
+
+
+		V2缓存信息：
+		（x）		A_Time_Line / Time : (sort set) 记录时间轴
+		（D）		A_Time_Line_Result
+		（MEC-N）	A_MEC_AvailableState / Zone_1 : (hash) 服务器状态表
+		（MEC-N）	A_Content_CacheMEC_1~4 / contentName : (sort set)			
+
+		（User-N）	WatchListSub 
+		（User-N）	A_User_AvailableState / u_id : (hash) 用户状态表
+
+		（N）		A_ContentName （set）
+		（Cont-N）	A_Content_ValueGlobal / contentName : (sort set) 全局点击数期望
+		（Cont-N）	A_Content_ValueZone_1~4 / contentName : (sort set) Zone点击数期望
+		（Cont-N）	A_Content_CopyNumberZone_1~4 / contentName : (hash) zone中内容copy数目
+		（Cont-N）	user.getCacheAddress() 在LRU和别的模式下有不同的数据结构				
+				
 				
 -----------------------------------------------------------------------------------
 Task的逻辑处理函数
