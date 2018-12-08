@@ -41,9 +41,6 @@ public class StartHereV2 {
 		long end_time = new Date(2018 - 1900, 0, 31, 23, 59, 59).getTime();
 		long batch = 60 * 60 * 1000; // 1 hour
 
-		// 初始化JAVA缓存空间
-		Init();
-
 		// 按照分钟取任务
 		while (start_time < end_time) {
 			// 监测使用
@@ -64,7 +61,7 @@ public class StartHereV2 {
 
 				switch (task.getTaskType()) {
 				case Source_Release:
-					ReleaseTask(task);
+					// ReleaseTask(task);
 					break;
 				case Upload:
 					UploadTask(task);
@@ -87,7 +84,7 @@ public class StartHereV2 {
 
 	}
 
-	public static void Init() {
+	static {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
 		// ------------------------------------------
@@ -347,7 +344,7 @@ public class StartHereV2 {
 		}
 
 		if (task.getSource_address().equals("A_User_AvailableState")) {
-			User_Info.get(task.getSource_id()).UserAvailableState--;
+			User_Info.get(Integer.parseInt(task.getSource_id())).UserAvailableState--;
 		}
 
 	}
