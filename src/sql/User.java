@@ -227,9 +227,7 @@ public class User {
 	@Override
 	public String toString() {
 		return "User [userId=" + userId + ", userName=" + userName + ", belongZoneName=" + belongZoneName
-				+ ", totalSubscribeNumber=" + totalSubscribeNumber + ", watchTimeWeek=" + watchTimeWeek
-				+ ", cacheEnable=" + cacheEnable + ", cacheAddress=" + cacheAddress + ", TimePatternName="
-				+ TimePatternId + ", watchDayProbability=" + watchDayProbability + "]";
+				+ ", cacheEnable=" + cacheEnable + ", UserAvailableState=" + UserAvailableState + "]";
 	}
 
 }

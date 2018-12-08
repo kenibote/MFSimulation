@@ -70,4 +70,10 @@ public class MEC implements Comparable<MEC> {
 	public int compareTo(MEC o) {
 		return this.MEC_Available_State - o.MEC_Available_State;
 	}
+
+	@Override
+	public String toString() {
+		return "MEC [BelongToZone=" + BelongToZone + ", MEC_Available_State=" + MEC_Available_State + "]";
+	}
+
 }
