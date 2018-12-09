@@ -21,8 +21,10 @@ public class Analysis {
 	public void analysisHit() throws Exception {
 
 		long start_time = new Date(2018 - 1900, 0, 1, 0, 0, 0).getTime();
-		long end_time = new Date(2018 - 1900, 0, 31, 23, 59, 59).getTime();
-		long batch = 60 * 1000; // 60s
+		long end_time = new Date(2018 - 1900, 0, 4, 23, 59, 59).getTime();
+		long batch = 60 * 60 * 1000; // 1 hour
+		ArrayList<TimeSlot> Result = new ArrayList<>();
+		FileWriter file = getFileForHit();
 
 		// 按照分钟取任务
 		while (start_time < end_time) {
