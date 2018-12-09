@@ -1,5 +1,6 @@
 package tool;
 
+import java.io.FileWriter;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -14,6 +15,8 @@ import org.jfree.data.time.Hour;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.junit.Test;
+
+import com.alibaba.fastjson.JSON;
 
 import redis.clients.jedis.Jedis;
 import sql.*;
@@ -337,6 +340,66 @@ public class GenerateTimeLine {
 		tx.commit();
 		session.close();
 		DataBaseTool.closeSessionFactory();
+	}
+
+	@SuppressWarnings("deprecation")
+	@Test
+	public void getEachZoneArrivalRateInfo() throws Exception {
+
+		Jedis redis = DataBaseTool.getJedis();
+		FileWriter file = getFile();
+		long start_time = new Date(2018 - 1900, 0, 3, 0, 0, 0).getTime();
+		long end_time = new Date(2018 - 1900, 0, 31, 23, 59, 59).getTime();
+		long batch = 60 * 60 * 1000; // 1 hour
+
+		while (start_time < end_time) {
+			// 读取数据
+			System.out.println("------:" + start_time);
+			Set<String> tasklist = redis.zrangeByScore("A_Time_Line", start_time, start_time + batch);
+
+			// 初始化统计数据
+			int[] count = new int[GenerateCreaterUser.zoneNumber + 1];
+			for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
+				count[i] = 0;
+			}
+
+			// 开始统计数据
+			for (String s : tasklist) {
+				// 监测使用
+				Task task = JSON.parseObject(s, Task.class);
+
+				if (task.getTaskType() == TaskType.Request) {
+					int pox = Integer.parseInt(task.getZoneName().split("_")[1]);
+					count[pox]++;
+				}
+
+			}
+
+			// 写出数据
+			file.write(new Date(start_time).toString() + ",");
+			for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
+				file.write(count[i] + ",");
+			}
+			file.write("\n");
+			file.flush();
+
+			// 更新时间
+			start_time += batch;
+		} // end while
+
+		file.close();
+	}
+
+	static FileWriter getFile() throws Exception {
+		FileWriter file = new FileWriter("D:\\WangNing\\ArrivalRateAnalysis.csv");
+
+		file.write(",");
+		for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
+			file.write("Zone" + i + ",");
+		}
+		file.write("\n");
+
+		return file;
 	}
 
 	@SuppressWarnings({ "deprecation", "unchecked" })

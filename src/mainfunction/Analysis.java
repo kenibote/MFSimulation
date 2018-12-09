@@ -67,8 +67,8 @@ public class Analysis {
 		file.write(",");
 		for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
 			file.write(",");
-			for (int j = 1; j <= TaskResult.values().length; j++) {
-				file.write("Zone" + i + ",");
+			for (TaskResult t : TaskResult.values()) {
+				file.write(t.toString() + ",");
 			}
 		}
 		file.write("\n");
@@ -76,8 +76,8 @@ public class Analysis {
 		file.write(",");
 		for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
 			file.write(",");
-			for (TaskResult t : TaskResult.values()) {
-				file.write(t.toString() + ",");
+			for (int j = 1; j <= TaskResult.values().length; j++) {
+				file.write("Zone" + i + ",");
 			}
 		}
 		file.write("\n");
