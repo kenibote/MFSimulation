@@ -71,6 +71,10 @@ public class MixCo {
 				int val = firstPartSet.get("Zone_" + i) + increaseBatch;
 				firstPartSet.put("Zone_" + i, val);
 			}
+			// 不可以超出容量限制
+			if (firstPartSet.get("Zone_1") > StartHereV2.MEC_Max_Cache) {
+				break;
+			}
 		}
 
 		// 将结果写回去
