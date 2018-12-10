@@ -73,7 +73,7 @@ public class Content {
 			if ("Global".equals(zone)) {
 				return -o1.ValueGlobal + o2.ValueGlobal;
 			}
-			return o1.ValueZone.get(zone) - o2.ValueZone.get(zone);
+			return -o1.ValueZone.get(zone) + o2.ValueZone.get(zone);
 		}
 
 	}

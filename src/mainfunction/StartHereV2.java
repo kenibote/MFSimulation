@@ -377,9 +377,8 @@ public class StartHereV2 {
 				MEC mec = MEC_Info.get("Zone_" + i);
 				mec.CacheSet.clear();
 
-				int totalsize = ContentAll.size();
 				for (int c = 0; c < MEC_Max_Cache; c++) {
-					mec.addOneContent(ContentAll.get(totalsize - c - 1));
+					mec.addOneContent(ContentAll.get(c));
 				}
 			}
 		}

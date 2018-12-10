@@ -62,7 +62,7 @@ public class Analysis {
 	}
 
 	static FileWriter getFileForHit() throws Exception {
-		FileWriter file = new FileWriter("/Users/kenibote/Desktop/MFSimulation.csv");
+		FileWriter file = new FileWriter("D:\\WangNing\\MFSimulation.csv");
 
 		file.write(",");
 		for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
