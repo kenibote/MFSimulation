@@ -69,7 +69,7 @@ public class StartHereV2 {
 					UploadTask(task);
 					break;
 				case MEC_Cache_Arrange:
-					MECArrangeTask();
+					MECArrangeTask(task);
 					break;
 				case Request:
 					RequestTaskV2(task);
@@ -365,9 +365,9 @@ public class StartHereV2 {
 		redis.zadd("Check_Info", check.getTime(), check.toJSON());
 	}
 
-	public static void MECArrangeTask() {
+	public static void MECArrangeTask(Task task) {
 		if (mecmode == MECMode.MIXCO) {
-
+			MixCo.PartOne(task);
 		}
 
 		if (mecmode == MECMode.TOP) {

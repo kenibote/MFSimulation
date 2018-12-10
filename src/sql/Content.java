@@ -2,6 +2,7 @@ package sql;
 
 import java.util.*;
 
+import mainfunction.MixCo;
 import tool.GenerateCreaterUser;
 
 public class Content {
@@ -19,6 +20,7 @@ public class Content {
 		}
 
 		zoneComparetor.put("Global", new ContentCompareterZone("Global"));
+		zoneComparetor.put("MixCo", new ContentCompareterZone("MixCo"));
 	}
 
 	public Content() {
@@ -60,6 +62,29 @@ public class Content {
 		return result;
 	}
 
+	public void checkIfZero() {
+		if (ValueGlobal < 0)
+			ValueGlobal = 0;
+
+		for (String s : ValueZone.keySet()) {
+			int val = ValueZone.get(s);
+			if (val < 0)
+				ValueZone.put(s, 0);
+		}
+	}
+
+	private int MixCoValue() {
+		int value = 0;
+
+		for (String s : ValueZone.keySet()) {
+			// TODO 此处值得思考
+			value = value + (int) (ValueZone.get(s) * MixCo.HourPressure.get(s)[MixCo.hour] * 10000
+					/ MixCo.totalZoneExp[MixCo.ZoneMap.get(s)]);
+		}
+
+		return value;
+	}
+
 	static class ContentCompareterZone implements Comparator<Content> {
 
 		String zone;
@@ -73,6 +98,11 @@ public class Content {
 			if ("Global".equals(zone)) {
 				return -o1.ValueGlobal + o2.ValueGlobal;
 			}
+
+			if ("MixCo".equals(zone)) {
+				return -o1.MixCoValue() + o2.MixCoValue();
+			}
+
 			return -o1.ValueZone.get(zone) + o2.ValueZone.get(zone);
 		}
 
