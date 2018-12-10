@@ -21,7 +21,7 @@ public class StartHereV2 {
 	public static int MEC_MAX_Capacity = 100;
 	public static int User_MAX_Capacity = 2;
 	static int Server_Time = 20; // 20s
-	public static int User_Max_Cache = 25;
+	public static int User_Max_Cache = 20;
 	public static int MEC_Max_Cache = 500;
 	static double Ratio = 90.0;
 
@@ -294,7 +294,7 @@ public class StartHereV2 {
 		boolean flag = false;
 
 		// 先在MEC中查找
-		flag = Find_MEC_LRU_MODE(watchContent, task, release);
+		flag = Find_MEC_MODE(watchContent, task, release);
 
 		// 如果MEC不能处理
 		if (!flag) {
