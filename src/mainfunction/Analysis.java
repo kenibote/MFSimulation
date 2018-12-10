@@ -8,6 +8,7 @@ import org.junit.Test;
 import com.alibaba.fastjson.JSON;
 
 import redis.clients.jedis.Jedis;
+import sql.CheckInfo;
 import sql.Task;
 import sql.TaskResult;
 import tool.DataBaseTool;
@@ -110,9 +111,52 @@ public class Analysis {
 
 	}
 
+	static FileWriter getFileForPressure() throws Exception {
+		FileWriter file = new FileWriter("D:\\WangNing\\MFSimulationPressure.csv");
+
+		file.write(",");
+		for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
+			file.write("Zone_" + i + ",");
+		}
+		file.write("\n");
+
+		return file;
+	}
+
+	@SuppressWarnings("deprecation")
 	@Test
 	public void analysisPressure() throws Exception {
 
+		long start_time = new Date(2018 - 1900, 0, 3, 0, 0, 0).getTime();
+		long end_time = new Date(2018 - 1900, 0, 4, 23, 59, 59).getTime();
+		long batch = 60 * 60 * 1000; // 1 hour
+		FileWriter file = getFileForPressure();
+
+		// 按照分钟取任务
+		while (start_time < end_time) {
+
+			String Line = new Date(start_time).toString();
+
+			// 获取内容并更新时间
+			System.out.println("------:" + start_time);
+			Set<String> infolist = redis.zrangeByScore("Check_Info", start_time, start_time + batch);
+			start_time += batch;
+
+			for (String s : infolist) {
+				// 监测使用
+				CheckInfo info = JSON.parseObject(s, CheckInfo.class);
+
+				file.write(Line + ",");
+				for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
+					file.write(info.getMEC_Pressure().get("Zone_" + i) + ",");
+				}
+				file.write("\n");
+			} // end for
+
+			file.flush();
+		} // end while
+
+		file.close();
 	}
 
 }

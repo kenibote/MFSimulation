@@ -393,7 +393,8 @@ public class StartHereV2 {
 			Collections.sort(ContentAll, Content.zoneComparetor.get("Global"));
 
 			// TODO 这里存在一个问题，初次重点内容都会被分配到mec1中，需要注意之后是否会动态调整。
-			for (int point = 0; point < GenerateCreaterUser.zoneNumber * MEC_Max_Cache; point++) {
+			for (int point = 0; point < GenerateCreaterUser.zoneNumber * MEC_Max_Cache
+					&& point < ContentAll.size(); point++) {
 				Content c = ContentAll.get(point);
 				ArrayList<String> order = c.getMaxOrderValueZone();
 				for (String zone : order) {
