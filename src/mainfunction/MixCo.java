@@ -49,6 +49,7 @@ public class MixCo {
 
 		// 准备排名顺序
 		cloneContentAll = (ArrayList<Content>) StartHereV2.ContentAll.clone();
+		// TODO 此处性能开销很大
 		Collections.sort(cloneContentAll, Content.zoneComparetor.get("MixCo"));
 		for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
 			cloneContentRank.put("Zone_" + i, (ArrayList<Content>) StartHereV2.ContentAll.clone());
@@ -141,7 +142,7 @@ public class MixCo {
 			ArrayList<ZoneRank> part2rank = new ArrayList<>();
 			for (String s : still_have_space) {
 				double value = content.ValueZone.get(s) * HourPressure.get(s)[hour] * 10000
-						/ EstimatePressure[ZoneMap.get(s)];
+						/ totalZoneExp[ZoneMap.get(s)];
 				part2rank.add(new ZoneRank(s, value));
 			}
 			Collections.sort(part2rank);
