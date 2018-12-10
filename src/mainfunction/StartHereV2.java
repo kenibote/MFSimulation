@@ -204,6 +204,11 @@ public class StartHereV2 {
 			// 更新资源释放任务信息
 			release.setSource_address("A_MEC_AvailableState");
 			release.setSource_id(target_server);
+			
+			if(mecmode == MECMode.LRU){
+				// 更新LRU顺序
+				MEC_Info.get(target_server).updataLRUorder(watchContent);
+			}
 		}
 
 		return flag;
@@ -289,11 +294,7 @@ public class StartHereV2 {
 		boolean flag = false;
 
 		// 先在MEC中查找
-		if (mecmode == MECMode.LRU) {
-			flag = Find_MEC_LRU_MODE(watchContent, task, release);
-		} else {
-			flag = Find_MEC_MODE(watchContent, task, release);
-		}
+		flag = Find_MEC_LRU_MODE(watchContent, task, release);
 
 		// 如果MEC不能处理
 		if (!flag) {
