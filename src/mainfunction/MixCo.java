@@ -94,7 +94,7 @@ public class MixCo {
 	static double[] EstimatePressure = new double[GenerateCreaterUser.zoneNumber + 1];
 	// TODO 这里的阈值需要调整可能
 	static double threadhold = 200.0;
-	static double L1 = 1.0, L2 = 3.0, L3 = 8.0;
+	static double L1 = 1.0, L2 = 3.0, L3 = 6.0;
 
 	static double PartTwo(HashMap<String, Integer> firstPartSet) {
 		// 初始化缓存
