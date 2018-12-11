@@ -12,6 +12,7 @@ public class Content {
 	public int ValueGlobal = 0;
 	public HashMap<String, Integer> ValueZone = new HashMap<>();
 	public HashMap<String, HashSet<User>> ContentCopy = new HashMap<>();
+	public int watchCount = 0;
 
 	public static HashMap<String, ContentCompareterZone> zoneComparetor = new HashMap<>();
 	static {
@@ -21,6 +22,7 @@ public class Content {
 
 		zoneComparetor.put("Global", new ContentCompareterZone("Global"));
 		zoneComparetor.put("MixCo", new ContentCompareterZone("MixCo"));
+		zoneComparetor.put("WatchCount", new ContentCompareterZone("WatchCount"));
 	}
 
 	public Content() {
@@ -101,6 +103,10 @@ public class Content {
 
 			if ("MixCo".equals(zone)) {
 				return -o1.MixCoValue() + o2.MixCoValue();
+			}
+
+			if ("WatchCount".equals(zone)) {
+				return -o1.watchCount + o2.watchCount;
 			}
 
 			return -o1.ValueZone.get(zone) + o2.ValueZone.get(zone);

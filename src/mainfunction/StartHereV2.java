@@ -34,6 +34,7 @@ public class StartHereV2 {
 	static HashMap<String, MEC> MEC_Info = new HashMap<>();
 	static ArrayList<Content> ContentAll = new ArrayList<>();
 	static Queue<Task> ReleaseTask = new LinkedList<>();
+	static ArrayList<Content> TopHit = null;
 
 	// 仿真程序从这里开始
 	@SuppressWarnings("deprecation")
@@ -155,8 +156,8 @@ public class StartHereV2 {
 			watchlist.remove(content);
 		} else {
 			// TODO 今后可能需要增加时间限制
-			// TODO 性能原因，随机从总的内容库中选一个
-			content = ContentAll.get(random.nextInt(ContentAll.size()));
+			// TODO 随机从Top 1000中选
+			content = TopHit.get(random.nextInt(1000));
 		}
 
 		return content;
@@ -204,8 +205,8 @@ public class StartHereV2 {
 			// 更新资源释放任务信息
 			release.setSource_address("A_MEC_AvailableState");
 			release.setSource_id(target_server);
-			
-			if(mecmode == MECMode.LRU){
+
+			if (mecmode == MECMode.LRU) {
 				// 更新LRU顺序
 				MEC_Info.get(target_server).updataLRUorder(watchContent);
 			}
@@ -339,6 +340,7 @@ public class StartHereV2 {
 		// 5. 更新本地以及全局，缓存中的期待观看数据；
 		watchContent.ValueGlobal--;
 		watchContent.decreaseZoneValue(task.getZoneName());
+		watchContent.watchCount++;
 	}
 
 	public static void ReleaseTask(Task task) {
@@ -366,7 +368,18 @@ public class StartHereV2 {
 		redis.zadd("Check_Info", check.getTime(), check.toJSON());
 	}
 
+	@SuppressWarnings({ "deprecation", "unchecked" })
 	public static void MECArrangeTask(Task task) {
+		// 更新TOP榜
+		if (task.getDate().getHours() == 0) {
+			TopHit = (ArrayList<Content>) ContentAll.clone();
+			Collections.sort(TopHit, Content.zoneComparetor.get("WatchCount"));
+			// 重置TOP榜单
+			for (Content c : ContentAll) {
+				c.watchCount = 0;
+			}
+		}
+
 		if (mecmode == MECMode.MIXCO) {
 			MixCo.PartOne(task);
 		}
