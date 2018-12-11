@@ -23,7 +23,7 @@ public class StartHereV2 {
 	static int Server_Time = 20; // 20s
 	public static int User_Max_Cache = 20;
 	public static int MEC_Max_Cache = 500;
-	static double Ratio = 90.0;
+	static double Ratio = 85.0;
 
 	static Jedis redis = DataBaseTool.getJedis();
 	static Random random = new Random();
@@ -155,9 +155,11 @@ public class StartHereV2 {
 			content = (Content) watchlist.toArray()[random.nextInt(watchlist.size())];
 			watchlist.remove(content);
 		} else {
-			// TODO 今后可能需要增加时间限制
-			// TODO 随机从Top 1000中选
-			content = TopHit.get(random.nextInt(1000));
+			if (ratio <= 95) {
+				content = TopHit.get(random.nextInt(1000));
+			} else {
+				content = ContentAll.get(random.nextInt(ContentAll.size()));
+			}
 		}
 
 		return content;
