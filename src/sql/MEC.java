@@ -27,20 +27,25 @@ public class MEC implements Comparable<MEC> {
 	}
 
 	// 用于非LRU模式
-	public void deleteOneCache() {
+	public boolean tryReplaceOneContent(Content newContent) {
 		// 找到值最低的 o(n)复杂度
 		Content content = null;
 		int min = Integer.MAX_VALUE;
 
 		for (Content c : CacheSet) {
-			if (c.ValueZone.get(BelongToZone) < min) {
+			if (c.ValueGlobal < min) {
 				content = c;
-				min = c.ValueZone.get(BelongToZone);
+				min = c.ValueGlobal;
 			}
 		}
 
-		// 移除该内容
-		CacheSet.remove(content);
+		if (content.ValueGlobal < newContent.ValueGlobal) {
+			CacheSet.remove(content);
+			CacheSet.add(newContent);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public void addOneContent(Content content) {

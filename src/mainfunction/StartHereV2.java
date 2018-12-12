@@ -134,14 +134,13 @@ public class StartHereV2 {
 		// 5. 根据该用户是否是热门用户，决定是否推送到MEC中； 且只有在MIXCO模式中才进行推送
 		if (mecmode == MECMode.MIXCO) {
 			if (creater.getPopular() == Popular.YES) {
-				for (int zone = 1; zone <= GenerateCreaterUser.zoneNumber; zone++) {
-					// 先清除一个位子出来
-					MEC_Info.get("Zone_" + zone).deleteOneCache();
-					// 将内容放进去
-					MEC_Info.get("Zone_" + zone).addOneContent(new_content);
+				for (String zone : new_content.getMaxOrderValueZone()) {
+					if (MEC_Info.get(zone).tryReplaceOneContent(new_content)) {
+						break;
+					}
 				}
-			}
-		}
+			} // if yes
+		} // if mixco
 
 	}
 
