@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSON;
 
 import redis.clients.jedis.Jedis;
 import sql.CheckInfo;
+import sql.Content;
 import sql.Task;
 import sql.TaskResult;
 import tool.DataBaseTool;
@@ -157,6 +158,21 @@ public class Analysis {
 		} // end while
 
 		file.close();
+	}
+
+	@SuppressWarnings("deprecation")
+	public static void ContentWatchCount(Date date) {
+		String fileName = StartHereV2.mecmode + "_" + StartHereV2.fogmode + "_WatchCount_" + date.getDate() + ".csv";
+		FileWriter file;
+		try {
+			file = new FileWriter("D:\\WangNing\\" + fileName);
+			for (Content c : StartHereV2.ContentAll) {
+				file.write(c.ContentName + "," + c.totalWatchCount + ",\n");
+			}
+			file.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

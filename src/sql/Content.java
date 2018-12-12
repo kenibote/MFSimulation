@@ -12,6 +12,7 @@ public class Content {
 	public int ValueGlobal = 0;
 	public HashMap<String, Integer> ValueZone = new HashMap<>();
 	public HashMap<String, HashSet<User>> ContentCopy = new HashMap<>();
+	public int totalWatchCount = 0;
 	public int watchCount = 0;
 
 	public static HashMap<String, ContentCompareterZone> zoneComparetor = new HashMap<>();

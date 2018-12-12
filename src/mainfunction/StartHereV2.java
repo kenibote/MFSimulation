@@ -343,6 +343,7 @@ public class StartHereV2 {
 		watchContent.ValueGlobal--;
 		watchContent.decreaseZoneValue(task.getZoneName());
 		watchContent.watchCount++;
+		watchContent.totalWatchCount++;
 	}
 
 	public static void ReleaseTask(Task task) {
@@ -380,6 +381,9 @@ public class StartHereV2 {
 			for (Content c : ContentAll) {
 				c.watchCount = 0;
 			}
+
+			// 观测使用
+			Analysis.ContentWatchCount(task.getDate());
 		}
 
 		if (mecmode == MECMode.MIXCO) {
