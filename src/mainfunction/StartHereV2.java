@@ -24,6 +24,7 @@ public class StartHereV2 {
 	public static int User_Max_Cache = 20;
 	public static int MEC_Max_Cache = 500;
 	static double Ratio = 85.0;
+	static int TopPopular = 200;
 
 	static Jedis redis = DataBaseTool.getJedis();
 	static Random random = new Random();
@@ -155,7 +156,7 @@ public class StartHereV2 {
 			watchlist.remove(content);
 		} else {
 			if (ratio <= 95) {
-				content = TopHit.get(random.nextInt(200));
+				content = TopHit.get(random.nextInt(TopPopular));
 			} else {
 				content = ContentAll.get(random.nextInt(ContentAll.size()));
 			}
@@ -377,8 +378,19 @@ public class StartHereV2 {
 			// 观测使用
 			Analysis.ContentWatchCount(task.getDate());
 
+			// 生成TOP 200的数据
 			TopHit = (ArrayList<Content>) ContentAll.clone();
 			Collections.sort(TopHit, Content.zoneComparetor.get("WatchCount"));
+
+			// TOP200的内容期望值被提升86
+			for (int i = 0; i < TopPopular; i++) {
+				TopHit.get(i).ValueGlobal += 344;
+				for (String s : TopHit.get(i).ValueZone.keySet()) {
+					int val = TopHit.get(i).ValueZone.get(s) + 86;
+					TopHit.get(i).ValueZone.put(s, val);
+				}
+			}
+
 			// 重置TOP榜单
 			for (Content c : ContentAll) {
 				c.watchCount = 0;
