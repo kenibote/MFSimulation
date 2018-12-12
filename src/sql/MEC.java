@@ -39,7 +39,7 @@ public class MEC implements Comparable<MEC> {
 			}
 		}
 
-		if (content.ValueGlobal < newContent.ValueGlobal) {
+		if (content != null && content.ValueGlobal < newContent.ValueGlobal) {
 			CacheSet.remove(content);
 			CacheSet.add(newContent);
 			return true;
