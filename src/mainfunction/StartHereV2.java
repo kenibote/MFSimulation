@@ -156,7 +156,7 @@ public class StartHereV2 {
 			watchlist.remove(content);
 		} else {
 			if (ratio <= 95) {
-				content = TopHit.get(random.nextInt(1000));
+				content = TopHit.get(random.nextInt(200));
 			} else {
 				content = ContentAll.get(random.nextInt(ContentAll.size()));
 			}
@@ -375,15 +375,15 @@ public class StartHereV2 {
 	public static void MECArrangeTask(Task task) {
 		// 更新TOP榜
 		if (task.getDate().getHours() == 0) {
+			// 观测使用
+			Analysis.ContentWatchCount(task.getDate());
+
 			TopHit = (ArrayList<Content>) ContentAll.clone();
 			Collections.sort(TopHit, Content.zoneComparetor.get("WatchCount"));
 			// 重置TOP榜单
 			for (Content c : ContentAll) {
 				c.watchCount = 0;
 			}
-
-			// 观测使用
-			Analysis.ContentWatchCount(task.getDate());
 		}
 
 		if (mecmode == MECMode.MIXCO) {

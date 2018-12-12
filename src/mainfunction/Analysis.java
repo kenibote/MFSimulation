@@ -162,14 +162,18 @@ public class Analysis {
 
 	@SuppressWarnings("deprecation")
 	public static void ContentWatchCount(Date date) {
-		String fileName = StartHereV2.mecmode + "_" + StartHereV2.fogmode + "_WatchCount_" + date.getDate() + ".csv";
-		FileWriter file;
+		String fileName = StartHereV2.mecmode + "_" + StartHereV2.fogmode + "_TotalWC_" + date.getDate() + ".csv";
+		String fileName2 = StartHereV2.mecmode + "_" + StartHereV2.fogmode + "_TopWatch_" + date.getDate() + ".csv";
+		FileWriter file, file2;
 		try {
 			file = new FileWriter("D:\\WangNing\\" + fileName);
+			file2 = new FileWriter("D:\\WangNing\\" + fileName2);
 			for (Content c : StartHereV2.ContentAll) {
 				file.write(c.ContentName + "," + c.totalWatchCount + ",\n");
+				file2.write(c.ContentName + "," + c.watchCount + ",\n");
 			}
 			file.close();
+			file2.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
