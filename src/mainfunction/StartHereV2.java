@@ -369,6 +369,19 @@ public class StartHereV2 {
 
 		// TODO 今后可能需要添加数据完整性检查过程
 		redis.zadd("Check_Info", check.getTime(), check.toJSON());
+
+		// 熵理论
+		ContentCopyShang(task);
+	}
+
+	public static void ContentCopyShang(Task task) {
+
+		HashMap<String, Integer> temp_save = new HashMap<>();
+		for (Content c : ContentAll) {
+			temp_save.put(c.ContentName, c.ContentCopy.get("Zone_1").size());
+		}
+
+		redis.zadd("ShangCheck", task.getDate().getTime(), JSON.toJSONString(temp_save));
 	}
 
 	@SuppressWarnings({ "deprecation", "unchecked" })
