@@ -376,12 +376,23 @@ public class StartHereV2 {
 
 	public static void ContentCopyShang(Task task) {
 
-		HashMap<String, Integer> temp_save = new HashMap<>();
+		ArrayList<Double> temp_save = new ArrayList<>();
+		double total = 0;
+		double result = 0;
 		for (Content c : ContentAll) {
-			temp_save.put(c.ContentName, c.ContentCopy.get("Zone_1").size());
+			int val = c.ContentCopy.get("Zone_1").size();
+			if (val > 0) {
+				temp_save.add((double) val);
+				total = total + val;
+			}
 		}
 
-		redis.zadd("ShangCheck", task.getDate().getTime(), JSON.toJSONString(temp_save));
+		for (double d : temp_save) {
+			double v = -(d / total) * (Math.log10(d / total)) / (Math.log10(2));
+			result = result + v;
+		}
+
+		redis.zadd("ShangCheck", task.getDate().getTime(), "" + result);
 	}
 
 	@SuppressWarnings({ "deprecation", "unchecked" })
