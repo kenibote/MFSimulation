@@ -366,7 +366,7 @@ public class GenerateCreaterUser {
 		}
 
 		// 画图
-		DrawPicture.DrawChart(dataset, "Propability Count", "Time", "Count");
+		DrawPicture.DrawChart(dataset, "Probability Count", "Time", "Count");
 		DrawPicture.waitExit();
 
 		// ------------------------------------------
@@ -624,8 +624,8 @@ public class GenerateCreaterUser {
 			User user = session.get(User.class, id);
 			int value = (int) (random.nextDouble() * 100);
 
-			// 约60%的人会进行缓存
-			if (value <= 60) {
+			// 约30%的人会进行缓存
+			if (value <= 30) {
 				user.setCacheEnable(CacheEnable.YES);
 			} else {
 				user.setCacheEnable(CacheEnable.NO);
