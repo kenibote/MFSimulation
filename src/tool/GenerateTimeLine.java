@@ -225,6 +225,8 @@ public class GenerateTimeLine {
 		// 目前没有用user中存的信息
 		double watchpro = 50.0 / 7.0;
 		TimePattern tp = session.get(TimePattern.class, 34);
+		TimePattern business = session.get(TimePattern.class, 35);
+		TimePattern home = session.get(TimePattern.class, 36);
 
 		// 为每一位用户设置请求任务
 		for (int u_id = 1; u_id <= GenerateCreaterUser.TotalUserNumber; u_id++) {
@@ -247,7 +249,10 @@ public class GenerateTimeLine {
 					// 产生时间点
 					HashSet<Long> time_point = new HashSet<>();
 					while (time_point.size() < watch_time) {
-						time_point.add(tp.getRandomTime(1, day).getTime());
+						if (user.getTimePatternId() == 35)
+							time_point.add(business.getRandomTime(1, day).getTime());
+						if (user.getTimePatternId() == 36)
+							time_point.add(home.getRandomTime(1, day).getTime());
 					}
 
 					// 根据获取的时间，创建任务

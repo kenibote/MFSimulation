@@ -289,6 +289,39 @@ public class GenerateCreaterUser {
 	}
 
 	@Test
+	public void TimePatternUnbalance() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+
+		double[] tp35 = { 0.01532567, 0.014559387, 0.006130268, 0.003831418, 0.006130268, 0.003831418, 0.022988506,
+				0.030651341, 0.042145594, 0.055172414, 0.063601533, 0.075862069, 0.085823755, 0.088122605, 0.076628352,
+				0.075095785, 0.06743295, 0.072030651, 0.072030651, 0.036015326, 0.021455939, 0.022988506, 0.022988506,
+				0.019157088 };
+
+		double[] tp36 = { 0.085409253, 0.077580071, 0.062633452, 0.046263345, 0.034163701, 0.03202847, 0.007117438,
+				0.007117438, 0.010676157, 0.008540925, 0.009252669, 0.006405694, 0.008540925, 0.010676157, 0.014234875,
+				0.012811388, 0.019928826, 0.024199288, 0.038434164, 0.076156584, 0.091103203, 0.106761566, 0.106761566,
+				0.103202847 };
+
+		TimePattern business = new TimePattern(35, "Business");
+		TimePattern home = new TimePattern(36, "Home");
+
+		for (int slot = 0; slot < 24; slot++) {
+			business.getPattern().put(slot, tp35[slot]);
+			home.getPattern().put(slot, tp36[slot]);
+		}
+
+		session.save(business);
+		session.save(home);
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
 	public void DeleteTimePatternBatch() {
 		Session session = DataBaseTool.getSession();
 		Transaction tx = session.beginTransaction();
@@ -533,6 +566,28 @@ public class GenerateCreaterUser {
 
 			// 目前是固定的用户请求模式
 			user.setTimePatternId(34);
+		}
+
+		// ------------------------------------------
+		tx.commit();
+		session.close();
+		DataBaseTool.closeSessionFactory();
+	}
+
+	@Test
+	public void setUserWatchPattern_2() {
+		Session session = DataBaseTool.getSession();
+		Transaction tx = session.beginTransaction();
+		// ------------------------------------------
+
+		for (int id = 1; id <= TotalUserNumber; id++) {
+			User user = session.get(User.class, id);
+
+			if ("Zone_1".equals(user.getBelongZoneName()) || "Zone_2".equals(user.getBelongZoneName()))
+				user.setTimePatternId(35);
+
+			if ("Zone_3".equals(user.getBelongZoneName()) || "Zone_4".equals(user.getBelongZoneName()))
+				user.setTimePatternId(36);
 		}
 
 		// ------------------------------------------
