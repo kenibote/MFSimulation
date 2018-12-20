@@ -36,8 +36,8 @@ public class MixCo2 {
 	// 克隆的缓存信息
 	static ArrayList<Content> cloneContentAll = null;
 	static HashMap<String, ArrayList<Content>> cloneContentRank = new HashMap<>();
-	// TODO 10个往上增长
-	static int increaseBatch = 10;
+	// TODO 5个往上增长
+	static int increaseBatch = 5;
 
 	@SuppressWarnings({ "deprecation", "unchecked" })
 	public static void PartOne(Task task) {
@@ -65,6 +65,13 @@ public class MixCo2 {
 			Collections.sort(cloneContentRank.get("Zone_" + i), Content.zoneComparetor.get("Zone_" + i));
 		}
 
+		// 根据到达率排序
+		ArrayList<ZoneRank> increaseRank = new ArrayList<>();
+		for (String name : HourPressure.keySet()) {
+			increaseRank.add(new ZoneRank(name, HourPressure.get(name)[hour]));
+		}
+		Collections.sort(increaseRank);
+
 		// 初始化第一部分的空间
 		HashMap<String, Integer> firstPartSet = new HashMap<>();
 		for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
@@ -72,33 +79,55 @@ public class MixCo2 {
 		}
 
 		double minLatency = Double.MAX_VALUE;
-		double newLatenct;
-		// 如果小于已知最小latency
-		while ((newLatenct = PartTwo(firstPartSet)) < minLatency) {
-			minLatency = newLatenct;
-			BackupCache = TempCache;
-			for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
-				int val = firstPartSet.get("Zone_" + i) + increaseBatch;
-				firstPartSet.put("Zone_" + i, val);
+		while (true) {
+			HashMap<String, Integer> firstPartSetA = (HashMap<String, Integer>) firstPartSet.clone();
+			HashMap<String, Integer> firstPartSetB = (HashMap<String, Integer>) firstPartSet.clone();
+
+			for (int i = 0; i < 2; i++) {
+				int val = firstPartSetA.get(increaseRank.get(i).name) + increaseBatch;
+				firstPartSetA.put(increaseRank.get(i).name, val);
 			}
-			// 不可以超出容量限制
-			if (firstPartSet.get("Zone_1") > StartHereV2.MEC_Max_Cache) {
+
+			for (int i = 0; i < 4; i++) {
+				int val = firstPartSetB.get(increaseRank.get(i).name) + increaseBatch;
+				firstPartSetB.put(increaseRank.get(i).name, val);
+			}
+
+			if (firstPartSetA.get(increaseRank.get(0).name) > StartHereV2.MEC_Max_Cache) {
 				break;
 			}
+
+			ArrayList<ZoneRank> paixu = new ArrayList<>();
+			paixu.add(new ZoneRank("A", PartTwo(firstPartSetA)));
+			paixu.add(new ZoneRank("B", PartTwo(firstPartSetB)));
+			Collections.sort(paixu, Collections.reverseOrder());
+
+			if (paixu.get(0).value < minLatency) {
+				minLatency = paixu.get(0).value;
+
+				if (paixu.get(0).name.equals("A"))
+					firstPartSet = firstPartSetA;
+				else
+					firstPartSet = firstPartSetB;
+
+			} else {
+				break;
+			}
+
 		}
 
+		PartTwo(firstPartSet);
 		// 将结果写回去
 		for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
 			MEC mec = StartHereV2.MEC_Info.get("Zone_" + i);
 			mec.CacheSet.clear();
-			for (Content c : BackupCache.get("Zone_" + i)) {
+			for (Content c : TempCache.get("Zone_" + i)) {
 				mec.CacheSet.add(c);
 			}
 		}
 	}
 
 	// 用于记录MEC缓存信息
-	static HashMap<String, HashSet<Content>> BackupCache = null;
 	static HashMap<String, HashSet<Content>> TempCache = null;
 	static double[] EstimatePressure = new double[GenerateCreaterUser.zoneNumber + 1];
 	// TODO 这里的阈值需要调整可能
@@ -115,6 +144,7 @@ public class MixCo2 {
 
 		// 用于记录哪些内容已经被存过
 		HashSet<Content> saved = new HashSet<>();
+		HashMap<Content, Integer> copyNumber = new HashMap<>();
 
 		// 缓存第一部分
 		for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
@@ -124,14 +154,41 @@ public class MixCo2 {
 				// 确定要缓存的内容
 				Content content = cloneContentRank.get("Zone_" + i).get(pox);
 
-				// 更新预估压力值 点击期望*到达率/总期望
-				EstimatePressure[i] += (content.ValueZone.get("Zone_" + i) * HourPressure.get("Zone_" + i)[hour]
-						/ totalZoneExp[i]);
+				// 记录有几份拷贝，用于计算压力负载
+				if (!copyNumber.containsKey(content)) {
+					copyNumber.put(content, 0);
+				}
+				int val = copyNumber.get(content) + 1;
+				copyNumber.put(content, val);
 
 				// 将内容放入缓存
 				zoneCache.add(content);
 				saved.add(content);
 				pox++;
+			}
+		}
+
+		// 更新预估压力值 点击期望*到达率/总期望
+		for (int i = 1; i <= GenerateCreaterUser.zoneNumber; i++) {
+			HashSet<Content> zoneCache = TempCache.get("Zone_" + i);
+			for (Content content : zoneCache) {
+				for (int j = 1; j <= GenerateCreaterUser.zoneNumber; j++) {
+					// 服务自己
+					if (i == j) {
+						EstimatePressure[i] += (content.ValueZone.get("Zone_" + j) * HourPressure.get("Zone_" + j)[hour]
+								/ totalZoneExp[j]);
+						continue;
+					}
+
+					if (TempCache.get("Zone_" + j).contains(content)) {
+						continue;
+					}
+
+					// 均摊别人的
+					EstimatePressure[i] += (content.ValueZone.get("Zone_" + j) * HourPressure.get("Zone_" + j)[hour]
+							/ totalZoneExp[j]) / copyNumber.get(content);
+				}
+
 			}
 		}
 
