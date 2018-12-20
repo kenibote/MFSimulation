@@ -2,7 +2,7 @@ package sql;
 
 import java.util.*;
 
-import mainfunction.MixCo;
+import mainfunction.MixCo2;
 import tool.GenerateCreaterUser;
 
 public class Content {
@@ -81,8 +81,8 @@ public class Content {
 
 		for (String s : ValueZone.keySet()) {
 			// TODO 此处值得思考
-			value = value + (int) (ValueZone.get(s) * MixCo.HourPressure.get(s)[MixCo.hour] * 10000
-					/ MixCo.totalZoneExp[MixCo.ZoneMap.get(s)]);
+			value = value + (int) (ValueZone.get(s) * MixCo2.HourPressure.get(s)[MixCo2.hour] * 10000
+					/ MixCo2.totalZoneExp[MixCo2.ZoneMap.get(s)]);
 		}
 
 		return value;
