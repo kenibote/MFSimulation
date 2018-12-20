@@ -422,7 +422,7 @@ public class StartHereV2 {
 		}
 
 		if (mecmode == MECMode.MIXCO) {
-			MixCo.PartOne(task);
+			MixCo2.PartOne(task);
 		}
 
 		if (mecmode == MECMode.TOP) {
