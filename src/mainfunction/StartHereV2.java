@@ -275,6 +275,14 @@ public class StartHereV2 {
 					// 如果工作在LRU模式,使对方的地址列表更新
 					target_user.updataLRUorder(watchContent);
 				}
+
+				// 用于统计由FOG服务的内容有多少是因为服务器负载满造成的
+				for (int i = 1; i < GenerateCreaterUser.zoneNumber; i++) {
+					if (MEC_Info.get("Zone_" + i).CacheSet.contains(watchContent)) {
+						redis.incr("OutPressure");
+						break;
+					}
+				}
 			} // end if
 
 		} // end if
