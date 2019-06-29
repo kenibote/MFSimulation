@@ -22,9 +22,9 @@ public class DataBaseTool {
 
 	// ---------------------------------------------------------
 
-	private static Jedis jedis = new Jedis("10.10.12.115", 6379);
+	private static Jedis jedis = new Jedis("10.10.12.97", 6379);
 	static {
-		jedis.auth("404wang");
+		jedis.auth("429a");
 	}
 
 	public static Jedis getJedis() {
